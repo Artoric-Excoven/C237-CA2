@@ -93,6 +93,41 @@ app.post('/register', validateRegistration, (req, res) => {
         res.redirect('/login');
     });
 });
+
+app.get('/login', (req, res) => {
+    res.render('login', { messages: req.flash('success'), errors: req.flash('error') });
+});
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    // Validate email and password
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/login');
+    }
+
+    const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
+    connection.query(sql, [email, password], (err, results) => {
+        if (err) {
+            throw err;
+        }
+
+        if (results.length > 0) {
+            // Successful login
+            req.session.user = results[0]; 
+            req.flash('success', 'Login successful!');
+            if(req.session.user.role == 'user')
+                res.redirect('/shopping');
+            else
+                res.redirect('/inventory');
+        } else {
+            // Invalid credentials
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    });
+});
 // -----------------------------------------------------------------------------------------------------
 
 // Middleware to check if user is logged in
