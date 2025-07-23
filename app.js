@@ -82,6 +82,20 @@ app.get('/register', (req, res) => {
     res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
 });
 
+app.post('/register', validateRegistration, (req, res) => {
+
+    const { username, email, password, address, contact, role } = req.body;
+
+    const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
+    connection.query(sql, [username, email, password, address, contact, role], (err, result) => {
+        if (err) {
+            throw err;
+        }
+        console.log(result);
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/login');
+    });
+});
 // -----------------------------------------------------------------------------------------------------
 
 // // Middleware to check if user is logged in
