@@ -78,6 +78,10 @@ app.get('/',  (req, res) => {
     res.render('index', {user: req.session.user} );
 });
 
+app.get('/register', (req, res) => {
+    res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
+});
+
 // -----------------------------------------------------------------------------------------------------
 
 // // Middleware to check if user is logged in
@@ -146,14 +150,6 @@ function renderPage(title, content) {
 }
 
 // Routes
-
-app.get('/', (req, res) => {
-  const content = `
-    <h1>Welcome to the Game Library</h1>
-    <p>Go to Games to see your current games, or Add Games, to add another!</p>
-  `;
-  res.send(renderPage("Home", content));
-});
 
 app.get('/addgames', (req, res) => {
   const content = `
