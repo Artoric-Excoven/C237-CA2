@@ -129,7 +129,7 @@ app.post('/login', (req, res) => {
         return res.redirect('/login');
     }
 
-    const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
+    const sql = 'SELECT * FROM Users WHERE email = ? AND password = SHA1(?)';
     connection.query(sql, [email, password], (err, results) => {
         if (err) {
             throw err;
