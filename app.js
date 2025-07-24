@@ -241,7 +241,14 @@ app.post('/addgames', (req, res) => {
 });
 
 app.get('/games', (req, res) => {
-  res.render('games', { games: games });
+  const sql = 'SELECT * FROM games';
+  connection.query(sql, (error, results) => {
+    if (error) {
+      console.error('Database query error:', error.message);
+      return res.status(500).send('Error retrieving games');
+    }
+    res.render('games', { games: results });
+  });
 });
 
 //   let listItems = games.map(game => `
