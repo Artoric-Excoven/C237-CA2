@@ -52,6 +52,7 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } 
 }));
 
+
 app.use(flash());
 
 // Middleware for form validation
@@ -137,6 +138,16 @@ const checkAuthenticated = (req, res, next) => {
     } else {
         req.flash('error', 'Please log in to view this resource');
         res.redirect('/login');
+    }
+};
+
+// Middleware to check if user is admin
+const checkAdmin = (req, res, next) => {
+    if (req.session.user.role === 'admin') {
+        return next();
+    } else {
+        req.flash('error', 'Access denied');
+        res.redirect('/shopping');
     }
 };
 
