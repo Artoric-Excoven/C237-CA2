@@ -89,13 +89,12 @@ const validateRegistration = (req, res, next) => {
         req.flash('formData', req.body);
         return res.redirect('/register');
     }
-    console.log("perhaps this works")
     next();
 };
 
 // Define routes
-app.get('/home',  (req, res) => {
-    res.render('home', {user: req.session.user} );
+app.get('/',  (req, res) => {
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/register', (req, res) => {
@@ -106,7 +105,7 @@ app.post('/register', validateRegistration, (req, res) => {
 
     const { username, email, password, address, contact, role } = req.body;
 
-    const sql = 'INSERT INTO Users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
+    const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
     connection.query(sql, [username, email, password, address, contact, role], (err, result) => {
         if (err) {
             throw err;
@@ -131,7 +130,6 @@ app.post('/login', (req, res) => {
     }
 
     const sql = 'SELECT * FROM Users WHERE email = ? AND password = SHA1(?)';
-    console.log(password)
     connection.query(sql, [email, password], (err, results) => {
         if (err) {
             throw err;
