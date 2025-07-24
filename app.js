@@ -149,7 +149,9 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.get('/home')
+app.get('/home',  (req, res) => {
+    res.render('home', {user: req.session.user} );
+});
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
