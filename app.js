@@ -242,28 +242,31 @@ app.post('/addgames', (req, res) => {
 });
 
 app.get('/games', (req, res) => {
-  let listItems = games.map(game => `
-    <li class="list-group-item bg-secondary text-white">
-      <strong>${game.title}</strong> (Publisher: ${game.publisher})<br>
-      ${game.imageUrl ? `<img src="${game.imageUrl}" class="img-thumbnail mb-2" style="max-width: 200px;" alt="${game.title} Cover" />` : ''}
-      <form action="/editgames/${game.id}" method="GET" class="d-inline me-2">
-        <button class="btn btn-success btn-sm mt-2" type="submit">Edit</button>
-      </form>
-      <form action="/deletegames/${game.id}" method="POST" class="d-inline">
-        <button class="btn btn-danger btn-sm mt-2" type="submit">Delete</button>
-      </form>
-    </li>
-  `).join('');
-
-  const content = `
-    <h1>Game List</h1>
-    <ul class="list-group">
-      ${listItems}
-    </ul>
-  `;
-
-  res.send(renderPage("Game List", content));
+  res.render('games', { games: games });
 });
+
+//   let listItems = games.map(game => `
+//     <li class="list-group-item bg-secondary text-white">
+//       <strong>${game.title}</strong> (Publisher: ${game.publisher})<br>
+//       ${game.imageUrl ? `<img src="${game.imageUrl}" class="img-thumbnail mb-2" style="max-width: 200px;" alt="${game.title} Cover" />` : ''}
+//       <form action="/editgames/${game.id}" method="GET" class="d-inline me-2">
+//         <button class="btn btn-success btn-sm mt-2" type="submit">Edit</button>
+//       </form>
+//       <form action="/deletegames/${game.id}" method="POST" class="d-inline">
+//         <button class="btn btn-danger btn-sm mt-2" type="submit">Delete</button>
+//       </form>
+//     </li>
+//   `).join('');
+
+//   const content = `
+//     <h1>Game List</h1>
+//     <ul class="list-group">
+//       ${listItems}
+//     </ul>
+//   `;
+
+//   res.send(renderPage("Game List", content));
+// });
 
 app.get('/editgames/:id', (req, res) => {
   const id = parseInt(req.params.id);
