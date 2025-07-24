@@ -130,6 +130,7 @@ app.post('/login', (req, res) => {
     }
 
     const sql = 'SELECT * FROM Users WHERE email = ? AND password = SHA1(?)';
+    console.log(password)
     connection.query(sql, [email, password], (err, results) => {
         if (err) {
             throw err;
