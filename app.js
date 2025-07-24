@@ -6,9 +6,6 @@ const flash = require('connect-flash');
 const multer = require('multer');
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -55,40 +52,104 @@ app.use(session({
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } 
 }));
 
+
 app.use(flash());
 
-// // Middleware for form validation
-// const validateRegistration = (req, res, next) => {
-//     const { username, email, password, address, contact, role } = req.body;
+// Middleware for form validation
+const validateRegistration = (req, res, next) => {
+    const { username, email, password, address, contact, role } = req.body;
 
-//     if (!username || !email || !password || !address || !contact || !role) {
-//         return res.status(400).send('All fields are required.');
-//     }
+    if (!username || !email || !password || !address || !contact || !role) {
+        return res.status(400).send('All fields are required.');
+    }
     
-//     if (password.length < 6) {
-//         req.flash('error', 'Password should be at least 6 or more characters long');
-//         req.flash('formData', req.body);
-//         return res.redirect('/register');
-//     }
-//     next();
-// };
+    if (password.length < 6) {
+        req.flash('error', 'Password should be at least 6 or more characters long');
+        req.flash('formData', req.body);
+        return res.redirect('/register');
+    }
+    next();
+};
 
 // Define routes
 app.get('/',  (req, res) => {
     res.render('index', {user: req.session.user} );
 });
 
+app.get('/register', (req, res) => {
+    res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
+});
+
+app.post('/register', validateRegistration, (req, res) => {
+
+    const { username, email, password, address, contact, role } = req.body;
+
+    const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
+    connection.query(sql, [username, email, password, address, contact, role], (err, result) => {
+        if (err) {
+            throw err;
+        }
+        console.log(result);
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/login');
+    });
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', { messages: req.flash('success'), errors: req.flash('error') });
+});
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    // Validate email and password
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/login');
+    }
+
+    const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
+    connection.query(sql, [email, password], (err, results) => {
+        if (err) {
+            throw err;
+        }
+
+        if (results.length > 0) {
+            // Successful login
+            req.session.user = results[0]; 
+            req.flash('success', 'Login successful!');
+            if(req.session.user.role == 'user')
+                res.redirect('/vapourstore');
+            else
+                res.redirect('/vapurstoreadmin');
+        } else {
+            // Invalid credentials
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    });
+});
 // -----------------------------------------------------------------------------------------------------
 
-// // Middleware to check if user is logged in
-// const checkAuthenticated = (req, res, next) => {
-//     if (req.session.user) {
-//         return next();
-//     } else {
-//         req.flash('error', 'Please log in to view this resource');
-//         res.redirect('/login');
-//     }
-// };
+// Middleware to check if user is logged in
+const checkAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        return next();
+    } else {
+        req.flash('error', 'Please log in to view this resource');
+        res.redirect('/login');
+    }
+};
+
+// Middleware to check if user is admin
+const checkAdmin = (req, res, next) => {
+    if (req.session.user.role === 'admin') {
+        return next();
+    } else {
+        req.flash('error', 'Access denied');
+        res.redirect('/shopping');
+    }
+};
 
 // let games = [
 //   { id: 1, title: "Doki Doki Literature Club", publisher: "Team Salvato", imageUrl: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaG5mOHYzbDFvdXJ0Y2tlZWtkM2ZvazZzbWE3em52Zm9sczV2aXE2MCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/kimYELmyrtIAd1TPFs/giphy.gif" },
@@ -96,64 +157,56 @@ app.get('/',  (req, res) => {
 //   { id: 3, title: "Minecraft", publisher: "Microsoft", imageUrl: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2ZwOGtocjc4cXY4ZGdleGRqOThrOHR6Z3FuZ24wcnVlaGo1bm4zciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NM4HoYcdbXdLO/giphy.gif" }
 // ];
 
-let recentlyDeleted = null;
-let undoTimer = null;
+// let recentlyDeleted = null;
+// let undoTimer = null;
 
-// Navbar rendering
-function renderNavbar() {
-  return `
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-      <div class="container-fluid">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link"><b>Gerald's Gaming Library</b></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/games">Games</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/addgames">Add Game</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  `;
-}
+// // Navbar rendering
+// function renderNavbar() {
+//   return `
+//     <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+//       <div class="container-fluid">
+//         <ul class="navbar-nav">
+//           <li class="nav-item">
+//             <a class="nav-link"><b>Gerald's Gaming Library</b></a>
+//           </li>
+//           <li class="nav-item">
+//             <a class="nav-link" href="/">Home</a>
+//           </li>
+//           <li class="nav-item">
+//             <a class="nav-link" href="/games">Games</a>
+//           </li>
+//           <li class="nav-item">
+//             <a class="nav-link" href="/addgames">Add Game</a>
+//           </li>
+//         </ul>
+//       </div>
+//     </nav>
+//   `;
+// }
 
-// Page wrapper
-function renderPage(title, content) {
-  return `
-    <!doctype html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <title>${title}</title>
-      </head>
-      <body class="bg-dark text-white">
-        ${renderNavbar()}
-        <div class="container mt-4">
-          ${content}
-        </div>
-      </body>
-    </html>
-  `;
-}
+// // Page wrapper
+// function renderPage(title, content) {
+//   return `
+//     <!doctype html>
+//     <html lang="en">
+//       <head>
+//         <meta charset="UTF-8" />
+//         <meta name="viewport" content="width=device-width, initial-scale=1" />
+//         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+//         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+//         <title>${title}</title>
+//       </head>
+//       <body class="bg-dark text-white">
+//         ${renderNavbar()}
+//         <div class="container mt-4">
+//           ${content}
+//         </div>
+//       </body>
+//     </html>
+//   `;
+// }
 
 // Routes
-
-app.get('/', (req, res) => {
-  const content = `
-    <h1>Welcome to the Game Library</h1>
-    <p>Go to Games to see your current games, or Add Games, to add another!</p>
-  `;
-  res.send(renderPage("Home", content));
-});
 
 app.get('/addgames', (req, res) => {
   const content = `
@@ -304,5 +357,16 @@ app.post('/restore', (req, res) => {
   res.redirect('/games');
 });
 
+app.get('/vapourstore', checkAuthenticated, (req, res) => {
+  connection.query('*SELECT* FROM Games', (error, results) => {
+    if (error) throw error;
+    res.render('vapourstore', { user: req.session.user, Games:results });
+  })
+});
+
+
+
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// TEST COMMIT
