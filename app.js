@@ -55,6 +55,27 @@ app.use(session({
 
 app.use(flash());
 
+
+// Middleware to check if user is logged in
+const checkAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        return next();
+    } else {
+        req.flash('error', 'Please log in to view this resource');
+        res.redirect('/login');
+    }
+};
+
+// Middleware to check if user is admin
+const checkAdmin = (req, res, next) => {
+    if (req.session.user.role === 'admin') {
+        return next();
+    } else {
+        req.flash('error', 'Access denied');
+        res.redirect('/shopping');
+    }
+};
+
 // Middleware for form validation
 const validateRegistration = (req, res, next) => {
     const { username, email, password, address, contact, role } = req.body;
@@ -118,10 +139,8 @@ app.post('/login', (req, res) => {
             // Successful login
             req.session.user = results[0]; 
             req.flash('success', 'Login successful!');
-            if(req.session.user.role == 'user')
-                res.redirect('/vapourstore');
-            else
-                res.redirect('/vapurstoreadmin');
+            if(req.session.user.role == 'user' || req.session.user.role == 'admin' )
+                res.redirect('/homepage');
         } else {
             // Invalid credentials
             req.flash('error', 'Invalid email or password.');
@@ -130,26 +149,6 @@ app.post('/login', (req, res) => {
     });
 });
 // -----------------------------------------------------------------------------------------------------
-
-// Middleware to check if user is logged in
-const checkAuthenticated = (req, res, next) => {
-    if (req.session.user) {
-        return next();
-    } else {
-        req.flash('error', 'Please log in to view this resource');
-        res.redirect('/login');
-    }
-};
-
-// Middleware to check if user is admin
-const checkAdmin = (req, res, next) => {
-    if (req.session.user.role === 'admin') {
-        return next();
-    } else {
-        req.flash('error', 'Access denied');
-        res.redirect('/shopping');
-    }
-};
 
 // let games = [
 //   { id: 1, title: "Doki Doki Literature Club", publisher: "Team Salvato", imageUrl: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaG5mOHYzbDFvdXJ0Y2tlZWtkM2ZvazZzbWE3em52Zm9sczV2aXE2MCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/kimYELmyrtIAd1TPFs/giphy.gif" },
