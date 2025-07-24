@@ -89,6 +89,7 @@ const validateRegistration = (req, res, next) => {
         req.flash('formData', req.body);
         return res.redirect('/register');
     }
+    console.log("perhaps this works")
     next();
 };
 
@@ -105,7 +106,7 @@ app.post('/register', validateRegistration, (req, res) => {
 
     const { username, email, password, address, contact, role } = req.body;
 
-    const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
+    const sql = 'INSERT INTO Users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
     connection.query(sql, [username, email, password, address, contact, role], (err, result) => {
         if (err) {
             throw err;
