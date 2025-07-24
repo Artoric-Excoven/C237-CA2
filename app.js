@@ -346,5 +346,14 @@ app.post('/restore', (req, res) => {
   res.redirect('/games');
 });
 
+app.get('/vapourstore', checkAuthenticated, (req, res) => {
+  connection.query('*SELECT* FROM Games', (error, results) => {
+    if (error) throw error;
+    res.render('vapourstore', { user: req.session.user, Games:results });
+  })
+});
+
+
+
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
