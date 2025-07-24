@@ -89,6 +89,7 @@ const validateRegistration = (req, res, next) => {
         req.flash('formData', req.body);
         return res.redirect('/register');
     }
+    console.log("perhaps this works")
     next();
 };
 
