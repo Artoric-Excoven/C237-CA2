@@ -94,8 +94,8 @@ const validateRegistration = (req, res, next) => {
 };
 
 // Define routes
-app.get('/home',  (req, res) => {
-    res.render('home', { Games: results, user: req.session.user });
+app.get('/',  (req, res) => {
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/register', (req, res) => {
