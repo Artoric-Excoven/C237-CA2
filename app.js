@@ -154,7 +154,11 @@ app.get('/home',  (req, res) => {
 });
 
 app.get('/vapourstore', (req,res) => {
-  res.render('vapourstore', { Games: results, user: req.session.user})
+  // Fetch data from MySQL
+    connection.query('SELECT * FROM Games', (error, results) => {
+      if (error) throw error;
+      res.render('vapourstore', { Games: results, user: req.session.user})
+    });
 })
 // -----------------------------------------------------------------------------------------------------
 
