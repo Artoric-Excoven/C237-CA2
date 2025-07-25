@@ -152,6 +152,10 @@ app.post('/login', (req, res) => {
 app.get('/home',  (req, res) => {
     res.render('home', {user: req.session.user} );
 });
+
+app.get('/vapourstore', (req,res) => {
+  res.render('vapourstore', { Games: results, user: req.session.user})
+})
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
