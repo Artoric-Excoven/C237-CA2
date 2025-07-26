@@ -153,13 +153,25 @@ app.get('/home',  (req, res) => {
     res.render('home', {user: req.session.user} );
 });
 
-app.get('/vapourstore', (req,res) => {
+app.get('/vapourstore', checkAuthenticated, (req,res) => {
   // Fetch data from MySQL
     connection.query('SELECT * FROM Games', (error, results) => {
       if (error) throw error;
       res.render('vapourstore', { Games: results, user: req.session.user})
     });
-})
+});
+
+app.get('/game/:title', checkAuthenticated, (req, res) => {
+  const gameId = req.params.id
+  connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
+      if (error) throw error;
+      if (results.length > 0) {
+        res.render('game', { game: results[0], user: req.session.user  });
+      } else {
+        res.status(404).send('Game not found');
+      }
+  });
+});
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
@@ -377,15 +389,6 @@ app.post('/restore', (req, res) => {
   }
   res.redirect('/games');
 });
-
-app.get('/vapourstore', checkAuthenticated, (req, res) => {
-  connection.query('*SELECT* FROM Games', (error, results) => {
-    if (error) throw error;
-    res.render('vapourstore', { user: req.session.user, Games:results });
-  })
-});
-
-
 
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

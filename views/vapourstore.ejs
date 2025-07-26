@@ -7,10 +7,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>Vapour Library</title>
   <style>
-    #motto {
-      border-left: 1px solid grey;
-      padding-left: 15px;
-    }
     .carousel-size {
       width: 300px;
       margin: auto;
@@ -35,7 +31,7 @@
       background-color: black;
       font-family: 'Times New Roman', Times, serif;
     }
-    .booksize {
+    .gameImageSize {
       width: 180px;
       height: 270px;
     }
@@ -45,13 +41,6 @@
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-    }
-    @media (max-width: 992px) {
-      #motto {
-        border-left: none;
-        border-top: 1px solid grey;
-        padding-left: 0px;
-      }
     }
   </style>
 </head>
@@ -67,7 +56,7 @@
         <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" href="/home">Home</a>
-          </li> 
+          </li> d
           <li class="nav-item">
             <a class="nav-link" href="/login">Login as new user?</a>
           </li> 
@@ -93,13 +82,13 @@
               </div>
               <div class="carousel-inner">
                 <div class="carousel-item active" data-bs-interval="10000">
-                  <img src="images/harrypotter600x900.png" class="d-block w-100" alt="Harry Potter">
+                  <img src="harrypotter600x900.png" class="d-block w-100" alt="Harry Potter">
                 </div>
                 <div class="carousel-item" data-bs-interval="10000">
-                  <img src="images/unbroken600x900.png" class="d-block w-100" alt="Unbroken">
+                  <img src="unbroken600x900.png" class="d-block w-100" alt="Unbroken">
                 </div>
                 <div class="carousel-item" data-bs-interval="10000">
-                  <img src="images/wonder600x900.png" class="d-block w-100" alt="Wonder">
+                  <img src="wonder600x900.png" class="d-block w-100" alt="Wonder">
                 </div>
               </div>
               <button class="carousel-control-prev" type="button" data-bs-target="#carousel1" data-bs-slide="prev">
@@ -143,31 +132,27 @@
       <div class="row">
         <div class="col-12">
           <br>
-          <h1>Recent Releases</h1>
+          <h1>All Games</h1>
         </div>
       </div>
-      <div class="row">
-        <div class="col-3">
-          <a href="wonder.html"><img class="booksize" src="images/wonder600x900.png" alt="Wonder"></a>
+      <% for (let i = 0; i < Games.length; i += 4) { %>
+        <div class="row">
+          <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
+            <div class="col-3 d-flex justify-content-center">
+              <a href="/game/<%= Games[j].gameId %>?id=<%= Games[j].id %>">
+                <img class="gameImageSize" src="<%= Games[j].image %>" alt="<%= Games[j].title %>">
+              </a>
+            </div>
+          <% } %>
         </div>
-        <div class="col-3">
-          <a href="harrypotter.html"><img class="booksize" src="images/harrypotter600x900.png" alt="Harry Potter"></a>
+        <div class="row">
+          <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
+            <div class="col-3 d-flex justify-content-center">
+              <p><%= Games[j].title %></p>
+            </div>
+          <% } %>
         </div>
-        <div class="col-3">
-          <a href="unbroken.html"><img class="booksize" src="images/unbroken600x900.png" alt="Unbroken"></a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-3 d-flex justify-content-center">
-          <p>Wonder</p>
-        </div>
-        <div class="col-3 d-flex justify-content-center">
-          <p>Harry Potter and the Philosopher's Stone</p>
-        </div>
-        <div class="col-3 d-flex justify-content-center">
-          <p>Unbroken</p>
-        </div>
-      </div>
+      <% } %>
     </div>
   </section>
 
@@ -179,7 +164,8 @@
 
       const carousel1Instance = new bootstrap.Carousel(carousel1);
       const carousel2Instance = new bootstrap.Carousel(carousel2);
-
+      
+      // UPDATE THIS PART TO LINK TO GAMES
       const bookLinks = [
         'harrypotter.html',
         'unbroken.html',
