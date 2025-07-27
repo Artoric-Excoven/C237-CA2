@@ -166,7 +166,7 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
     });
 });
 
-app.get('/game/:title', checkAuthenticated, (req, res) => {
+app.get('/game/:id', checkAuthenticated, (req, res) => {
   const gameId = req.params.id
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
       if (error) throw error;
