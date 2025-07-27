@@ -68,6 +68,18 @@
               <a class="nav-link" href="/addGame">Add Game</a>
             </li>
           <% } %>
+          <form action="/placesomethinghere" class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search"/>
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              More
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
@@ -87,13 +99,13 @@
               </div>
               <div class="carousel-inner">
                 <div class="carousel-item active" data-bs-interval="10000">
-                  <img src="harrypotter600x900.png" class="d-block w-100" alt="Harry Potter">
+                  <img src="images/harrypotter600x900.png" class="d-block w-100" alt="Harry Potter">
                 </div>
                 <div class="carousel-item" data-bs-interval="10000">
-                  <img src="unbroken600x900.png" class="d-block w-100" alt="Unbroken">
+                  <img src="images/unbroken600x900.png" class="d-block w-100" alt="Unbroken">
                 </div>
                 <div class="carousel-item" data-bs-interval="10000">
-                  <img src="wonder600x900.png" class="d-block w-100" alt="Wonder">
+                  <img src="images/wonder600x900.png" class="d-block w-100" alt="Wonder">
                 </div>
               </div>
               <button class="carousel-control-prev" type="button" data-bs-target="#carousel1" data-bs-slide="prev">
@@ -143,10 +155,9 @@
       <% for (let i = 0; i < Games.length; i += 4) { %>
         <div class="row">
           <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
-            <% console.log([Games[j]) %>
             <div class="col-3 d-flex justify-content-center">
               <a href="/game/<%= Games[j].title %>?id=<%= Games[j].id %>">
-                <img class="gameImageSize" src="/images/<%= Games[j].image %>">
+                <img class="gameImageSize" src="images/<%= Games[j].image %>" alt="<%= Games[j].title %>">
               </a>
             </div>
           <% } %>
