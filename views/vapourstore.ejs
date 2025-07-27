@@ -153,7 +153,7 @@
         <div class="row">
           <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
             <div class="col-3 d-flex justify-content-center">
-              <a href="/game/<%= Games[j].title %>?id=<%= Games[j].gameId %>">
+              <a href="/game/<%= encodeURIComponent(Games[j].title) %>?id=<%= Games[j].gameId %>">
                 <img class="gameImageSize" src="images/<%= Games[j].image %>" alt="<%= Games[j].title %>">
               </a>
             </div>
