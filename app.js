@@ -149,6 +149,11 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
+
 app.get('/home',  (req, res) => {
     res.render('home', {user: req.session.user} );
 });
@@ -176,6 +181,7 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', {user: req.session.user } ); 
 });
+
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
