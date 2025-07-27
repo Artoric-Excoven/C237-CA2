@@ -62,7 +62,12 @@
           </li> 
           <li class="nav-item">
             <a class="nav-link" href="/vapourstore">Store</a>
-          </li> 
+          </li>
+          <% if (user.role === "admin") { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/addGame">Add Game</a>
+            </li>
+          <% } %>
         </ul>
       </div>
     </div>

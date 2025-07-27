@@ -172,6 +172,10 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
       }
   });
 });
+
+app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
+  res.render('addGame', {user: req.session.user } ); 
+});
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
