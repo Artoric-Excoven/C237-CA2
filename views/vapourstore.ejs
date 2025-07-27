@@ -19,7 +19,7 @@
       margin-top: 5%;
     }
     #bestseller-BG {
-      background-image: url('images/bookstoreBG.jpg');
+      background-image: url('images/vapour.jpg');
       background-size: cover;
       background-position: center;
       height: 600px;
@@ -52,7 +52,7 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <div class="collapse navbar-collapse d-flex justify-content-between" id="collapsibleNavbar">
         <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" href="/home">Home</a>
@@ -76,11 +76,11 @@
               <a class="nav-link" href="/addGame">Add Game</a>
             </li>
           <% } %>
-          <form class="d-flex" role="search">
+        </ul>
+        <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" placeholder="Search"/>
             <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
-        </ul>
+        </form>
       </div>
     </div>
   </nav>
@@ -156,7 +156,7 @@
         <div class="row">
           <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
             <div class="col-3 d-flex justify-content-center">
-              <a href="/game/<%= Games[j].title %>?id=<%= Games[j].id %>">
+              <a href="/game/<%= Games[j].title %>?id=<%= Games[j].gameId %>">
                 <img class="gameImageSize" src="images/<%= Games[j].image %>" alt="<%= Games[j].title %>">
               </a>
             </div>
