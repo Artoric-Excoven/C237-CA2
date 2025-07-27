@@ -166,8 +166,13 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
     });
 });
 
-app.get('/game/:id', checkAuthenticated, (req, res) => {
-  const gameId = req.params.id
+app.get('/game/:title', checkAuthenticated, (req, res) => {
+  const gameId = req.query.id
+  
+  if (!gameId) {
+    return res.status(400).send('Game ID not found');
+  }
+
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
       if (error) throw error;
       if (results.length > 0) {
