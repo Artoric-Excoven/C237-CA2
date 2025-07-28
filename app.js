@@ -187,6 +187,28 @@ app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', {user: req.session.user } ); 
 });
 
+app.post('/addGame', upload.single('image'),  (req, res) => {
+    const { title, price, desc } = req.body;
+    let image;
+    if (req.file) {
+        image = req.file.filename;
+    } else {
+        image = null;
+    }
+
+    const sql = 'INSERT INTO Games (title, price, desc, image) VALUES (?, ?, ?, ?)';
+    connection.query(sql , [title, price, desc, image], (error, results) => {
+        if (error) {
+            console.error("Error adding game:", error);
+            res.status(500).send('Error adding game');
+        } else {
+            res.redirect('/admin');
+        }
+    });
+});
+
+
+
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
