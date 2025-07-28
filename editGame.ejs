@@ -1,0 +1,33 @@
+<div class="container mt-4">
+        <h2 class="text-center mb-4">Edit Game</h2>
+        
+        <% if (game) { %>
+            <form action="/editGame/<%= game.gameId %>" method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 500px;">
+                
+                <div class="mb-3">
+                    <label for="title" class="form-label">Game Title</label>
+                    <input type="text" class="form-control" id="title" name="title" value="<%= game.title %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price</label>
+                    <input type="number" class="form-control" id="price" name="price" min="0" max="999.99" step="0.01" value="<%= game.price %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="desc" class="form-label">Description:</label>
+                    <textarea class="form-control" id="desc" name="desc" rows="3"><%= game.desc %></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <img src="/images/<%= game.image %>" class="img-thumbnail mb-3" style="width: 150px;">
+                    <label for="image" class="form-label">Game Image</label>
+                    <input class="form-control" type="file" id="image" name="image" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Game</button>
+            </form>
+        <% } else { %>
+            <p class="text-danger">Game not found.</p>
+        <% } %>
+</div>
