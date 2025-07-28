@@ -14,21 +14,43 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav">
-            <% if (!user) {%>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                </li> 
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li> 
-            <% } else { %>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
-                </li> 
+        <div class="collapse navbar-collapse d-flex justify-content-between" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
+          </li> 
+          <% if (!user) {%>
+            <li class="nav-item">
+                <a class="nav-link" href="/register">Register</a>
+            </li> 
+            <li class="nav-item">
+                <a class="nav-link" href="/login">Login</a>
+            </li> 
+          <% } else { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/vapourstore">Store</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                More
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+              </ul>
+            </li>
+            <% if (user.role === "admin") { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/addGame">Add Game</a>
+              </li>
             <% } %>
-          </ul>
+          <% } %>
+        </ul>
+        <% if (user) { %>
+          <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search"/>
+              <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        <% } %>
         </div>
       </div>
     </nav>
@@ -36,16 +58,13 @@
     <div class="container">
         <p style="text-align: center;">
             <% if (user) {%>
-              <% if (user.role === "admin") { %>
+              <% if (user.role === "admin" || user.role === "user") { %>
                 <br>
-                Back to <a href="/inventory">inventory!</a>
-              <% } else { %>
-                <br>
-                Continue <a href="/shopping">Shopping!</a>
-                <% } %>
+                Back to <a href="/vapourstore">vapourstore!</a>
+              <% } %>
             <% } else { %>
             <br>
-            Welcome to Vapor Library<br>
+            Welcome to Vapour Library<br>
             Please <a href = "/login" >login</a> to continue...
             <% } %>
         </p>

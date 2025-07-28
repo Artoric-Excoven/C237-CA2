@@ -1,4 +1,4 @@
-// https://vapor-library.onrender.com/
+// https://vapour-library.onrender.com/
 const express = require('express');
 const mysql = require('mysql2');
 const session = require('express-session');
@@ -89,13 +89,12 @@ const validateRegistration = (req, res, next) => {
         req.flash('formData', req.body);
         return res.redirect('/register');
     }
-    console.log("perhaps this works")
     next();
 };
 
 // Define routes
-app.get('/home',  (req, res) => {
-    res.render('home', {user: req.session.user} );
+app.get('/',  (req, res) => {
+    res.render('index', {user: req.session.user} );
 });
 
 app.get('/register', (req, res) => {
@@ -131,7 +130,6 @@ app.post('/login', (req, res) => {
     }
 
     const sql = 'SELECT * FROM Users WHERE email = ? AND password = SHA1(?)';
-    console.log(password)
     connection.query(sql, [email, password], (err, results) => {
         if (err) {
             throw err;
@@ -150,6 +148,45 @@ app.post('/login', (req, res) => {
         }
     });
 });
+
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
+
+app.get('/home',  (req, res) => {
+    res.render('home', {user: req.session.user} );
+});
+
+app.get('/vapourstore', checkAuthenticated, (req,res) => {
+  // Fetch data from MySQL
+    connection.query('SELECT * FROM Games', (error, results) => {
+      if (error) throw error;
+      res.render('vapourstore', { Games: results, user: req.session.user})
+    });
+});
+
+app.get('/game/:title', checkAuthenticated, (req, res) => {
+  const gameId = req.query.id
+  
+  if (!gameId) {
+    return res.status(400).send('Game ID not found');
+  }
+
+  connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
+      if (error) throw error;
+      if (results.length > 0) {
+        res.render('game', { game: results[0], user: req.session.user  });
+      } else {
+        res.status(404).send('Game not found');
+      }
+  });
+});
+
+app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
+  res.render('addGame', {user: req.session.user } ); 
+});
+
 // -----------------------------------------------------------------------------------------------------
 
 // let games = [
@@ -367,15 +404,6 @@ app.post('/restore', (req, res) => {
   }
   res.redirect('/games');
 });
-
-app.get('/vapourstore', checkAuthenticated, (req, res) => {
-  connection.query('*SELECT* FROM Games', (error, results) => {
-    if (error) throw error;
-    res.render('vapourstore', { user: req.session.user, Games:results });
-  })
-});
-
-
 
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
