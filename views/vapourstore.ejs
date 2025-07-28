@@ -72,11 +72,14 @@
             <li class="nav-item">
               <a class="nav-link" href="/addGame">Add Game</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin">Admin Panel</a>
+            </li>
           <% } %>
-        </ul>
-        <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search"/>
-            <button class="btn btn-outline-success" type="submit">Search</button>
+        </ul>     
+        <form class="d-flex" role="search" action="/search" method="POST">
+          <input class="form-control me-2" type="search" name="query" placeholder="Search" required />
+          <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
       </div>
     </div>
