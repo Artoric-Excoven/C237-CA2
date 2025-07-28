@@ -4,17 +4,19 @@ const mysql = require('mysql2');
 const session = require('express-session');
 const flash = require('connect-flash');
 const multer = require('multer');
+const path = require('path')
 const app = express();
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/images'); // Directory to save uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); 
-    }
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'public/images'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname); // Unique filename to prevent clashes
+  }
 });
+
 
 const upload = multer({ storage: storage });
 
