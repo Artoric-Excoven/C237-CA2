@@ -202,7 +202,7 @@ app.post('/addGame', upload.single('image'),  (req, res) => {
             console.error("Error adding game:", error);
             res.status(500).send('Error adding game');
         } else {
-            res.redirect('/admin');
+            res.redirect('/vapourStore');
         }
     });
 });
