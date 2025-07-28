@@ -54,12 +54,20 @@
         <h3>Search: <%= query.searchQuery %></h3>
       </div>
     </div>
+    <div class="mb-4">
+    <div class="card text-bg-info">
+      <div class="card-body">
+        <h5 class="card-title">Total Games</h5>
+          <p class="card-text fs-4"><%= Games.length %></p>
+        </div>
+      </div>
+    </div>
     <% for (let i = 0; i < Games.length; i += 4) { %>
       <div class="row">
         <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
           <div class="col-3 d-flex justify-content-center">
             <a href="/game/<%= encodeURIComponent(Games[j].title) %>?id=<%= Games[j].gameId %>">
-            <img class="gameImageSize" src="images/<%= Games[j].image %>" alt="<%= Games[j].title %>">
+              <img src="images/<%= Games[j].image %>" alt="<%= Games[j].title %>" width="320" height="240">
             </a>
           </div>
         <% } %>
@@ -73,15 +81,5 @@
       </div>
     <% } %>
   </div>
-
-  <div class="mb-4">
-    <div class="card text-bg-info">
-      <div class="card-body">
-        <h5 class="card-title">Total Games</h5>
-        <p class="card-text fs-4"><%= Games.length %></p>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>
