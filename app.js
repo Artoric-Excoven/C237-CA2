@@ -98,7 +98,11 @@ app.get('/',  (req, res) => {
 });
 
 app.get('/register', (req, res) => {
+  if (req.session.user) {
+    return res.redirect('/');
+  } else {
     res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
+  }
 });
 
 app.post('/register', validateRegistration, (req, res) => {
@@ -117,7 +121,11 @@ app.post('/register', validateRegistration, (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { messages: req.flash('success'), errors: req.flash('error') });
+  if (req.session.user) {
+      return res.redirect('/');
+  } else {
+    res.render('login', { user: req.session.user, messages: req.flash('success'), errors: req.flash('error') });
+  }
 });
 
 app.post('/login', (req, res) => {
@@ -184,7 +192,7 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
 });
 
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
-  res.render('addGame', {user: req.session.user } ); 
+  res.render('addGame', { user: req.session.user } ); 
 });
 
 app.post('/addGame', upload.single('image'),  (req, res) => {
