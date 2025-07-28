@@ -226,7 +226,7 @@ app.get('/updateProduct/:id',checkAuthenticated, checkAdmin, (req,res) => {
     });
 });
 
-app.post('/updateProduct/:id', upload.single('image'), (req, res) => {
+app.post('/updateProduct/:id', upload.single('image'), checkAuthenticated, (req, res) => {
     const productId = req.params.id;
     // Extract product data from the request body
     const { name, quantity, price } = req.body;
@@ -249,7 +249,7 @@ app.post('/updateProduct/:id', upload.single('image'), (req, res) => {
     });
 });
 
-app.get('/deleteProduct/:id', (req, res) => {
+app.get('/deleteProduct/:id', checkAuthenticated, (req, res) => {
     const productId = req.params.id;
 
     connection.query('DELETE FROM products WHERE productId = ?', [productId], (error, results) => {
@@ -263,6 +263,18 @@ app.get('/deleteProduct/:id', (req, res) => {
         }
     });
 });
+
+app.get('search', checkAuthenticated, (req, res) => {
+  res.render('search', {user: req.session.user} );
+});
+
+
+app.post('/search', checkAuthenticated, (req, res) => {
+  const searchQuery = req.body.query;
+  // Perform search logic here (e.g., query database)
+  res.render('searchResults', { user: req.session.user, query: searchQuery });
+});
+
 
 // -----------------------------------------------------------------------------------------------------
 
