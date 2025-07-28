@@ -249,23 +249,21 @@ app.post('/updateProduct/:id', upload.single('image'), checkAuthenticated, (req,
     });
 });
 
-app.get('/deleteProduct/:id', checkAuthenticated, (req, res) => {
-    const productId = req.params.id;
+app.get('/deleteGame/:id', checkAuthenticated, (req, res) => {
+    const gameId = req.params.id;
 
-    connection.query('DELETE FROM products WHERE productId = ?', [productId], (error, results) => {
+    connection.query('DELETE FROM Games WHERE gameId = ?', [gameId], (error, results) => {
         if (error) {
-            // Handle any error that occurs during the database operation
-            console.error("Error deleting product:", error);
-            res.status(500).send('Error deleting product');
+            console.error("Error deleting game:", error);
+            res.status(500).send('Error deleting game');
         } else {
-            // Send a success response
-            res.redirect('/inventory');
+            res.redirect('/admin');
         }
     });
 });
 
-app.get('/search', checkAuthenticated, (req, res) => {
-  res.render('search', {user: req.session.user} );
+app.get('/searchResults', checkAuthenticated, (req, res) => {
+  res.render('searchResults', {user: req.session.user} );
 });
 
 
