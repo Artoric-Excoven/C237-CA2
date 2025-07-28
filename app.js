@@ -7,18 +7,20 @@ const multer = require('multer');
 const path = require('path')
 const app = express();
 
-// Set up multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'public/images'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname); // Unique filename to prevent clashes
+// cloudinary image storage (PAINFUL TO MAKE)
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('./config/cloudinary');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'game-images',
+    allowed_formats: ['jpg', 'png']
   }
 });
 
-
 const upload = multer({ storage: storage });
+
 
 const connection = mysql.createConnection({
     host: '1yfliu.h.filess.io',
@@ -197,25 +199,21 @@ app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', { user: req.session.user } ); 
 });
 
-app.post('/addGame', upload.single('image'),  (req, res) => {
-    const { title, price, desc } = req.body;
-    let image;
-    if (req.file) {
-        image = req.file.filename;
-    } else {
-        image = null;
-    }
+app.post('/addGame', upload.single('image'), (req, res) => {
+  const { title, price, desc } = req.body;
+  const imageUrl = req.file.path; // Cloudinary URL into DB
 
-    const sql = 'INSERT INTO Games (title, price, `desc`, image) VALUES (?, ?, ?, ?)';
-    connection.query(sql , [title, price, desc, image], (error, results) => {
-        if (error) {
-            console.error("Error adding game:", error);
-            res.status(500).send('Error adding game');
-        } else {
-            res.redirect('/vapourStore');
-        }
-    });
+  const sql = 'INSERT INTO Games (title, price, `desc`, image) VALUES (?, ?, ?, ?)';
+  connection.query(sql, [title, price, desc, imageUrl], (error, results) => {
+    if (error) {
+      console.error("Error adding game:", error);
+      res.status(500).send('Error adding game');
+    } else {
+      res.redirect('/vapourStore');
+    }
+  });
 });
+
 
 app.get('/updateProduct/:id',checkAuthenticated, checkAdmin, (req,res) => {
     const productId = req.params.id;
