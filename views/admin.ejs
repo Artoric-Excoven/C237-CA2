@@ -70,7 +70,7 @@
             </thead>
             <tbody>
                 <% if (games.length > 0) { %>
-                <% games.forEach((game, index) => { %>
+                <% games.forEach((game, gameId) => { %>
                     <tr>
                     <td><%= game.gameId %></td>
                     <td><%= game.title %></td>
