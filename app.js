@@ -264,7 +264,7 @@ app.get('/deleteProduct/:id', checkAuthenticated, (req, res) => {
     });
 });
 
-app.get('search', checkAuthenticated, (req, res) => {
+app.get('/search', checkAuthenticated, (req, res) => {
   res.render('search', {user: req.session.user} );
 });
 
@@ -275,6 +275,12 @@ app.post('/search', checkAuthenticated, (req, res) => {
   res.render('searchResults', { user: req.session.user, query: searchQuery });
 });
 
+app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
+  connection.query('SELECT * FROM Games', (error, results) => {
+    if (error) throw error;
+    res.render('admin', { Games: results, user: req.session.user})
+  });
+})
 
 // -----------------------------------------------------------------------------------------------------
 
