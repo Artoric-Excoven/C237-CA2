@@ -269,9 +269,23 @@ app.get('/searchResults', checkAuthenticated, (req, res) => {
 
 app.post('/search', checkAuthenticated, (req, res) => {
   const searchQuery = req.body.query;
-  // Perform search logic here (e.g., query database)
-  res.render('searchResults', { user: req.session.user, query: searchQuery });
+  const sqlQuery = 'SELECT * FROM Games WHERE title LIKE ?';
+  const searchTerm = `%${searchQuery}%`;
+
+  connection.query(sqlQuery, [searchTerm], (error, results) => {
+    if (error) {
+      console.error("Error finding game(s):", error);
+      res.status(500).send('Error finding game(s)');
+    } else {
+      res.render('searchResults', {
+        user: req.session.user,
+        query: searchQuery,
+        Games: results
+      });
+    }
+  });
 });
+
 
 app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   connection.query('SELECT * FROM Games', (error, results) => {
