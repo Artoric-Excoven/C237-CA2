@@ -79,7 +79,7 @@
             <td>$<%= game.price %></td>
             <td><%= game.desc %></td>
             <td>
-                <img src="images/<%= game.image %>" alt="Game Image" width="80" height="60" style="object-fit: cover;">
+                <img src="<%= game.image %>" alt="Game Image" width="80" height="60" style="object-fit: cover;">
             </td>
             <td>
               <a href="/admin/edit/<%= game.id %>" class="btn btn-warning btn-sm">Edit</a>
