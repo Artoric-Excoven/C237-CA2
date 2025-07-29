@@ -41,7 +41,7 @@ connection.connect((err) => {
 // Set up view engine
 app.set('view engine', 'ejs');
 //  enable static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 // enable form processing
 app.use(express.urlencoded({
     extended: false
