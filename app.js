@@ -167,12 +167,24 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/home', checkAuthenticated, (req, res) => {
-  const userId = req.session.user.id
-  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, results) => {
+  const userId = req.session.user.id;
+
+  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, gamesOwned) => {
     if (error) throw error;
-    res.render('home', {games: results, user: req.session.user} );
+    const gamesId = gamesOwned.map(row => row.gameId);
+
+    if (gamesId.length === 0) {
+      if (error) throw error;
+      return res.render('home', { games: [], user: req.session.user });
+    } else {
+      connection.query('SELECT * FROM Games WHERE gameId IN (?)', [gamesId], (error, results) => {
+        if (error) throw error;
+        res.render('home', { games: results, user: req.session.user });
+      });
+    }
   });
 });
+
 
 app.get('/vapourstore', checkAuthenticated, (req,res) => {
   // Fetch data from MySQL
