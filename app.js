@@ -166,8 +166,12 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get('/home',  (req, res) => {
-    res.render('home', {user: req.session.user} );
+app.get('/home', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id
+  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, results) => {
+    if (error) throw error;
+    res.render('home', {games: results, user: req.session.user} );
+  });
 });
 
 app.get('/vapourstore', checkAuthenticated, (req,res) => {

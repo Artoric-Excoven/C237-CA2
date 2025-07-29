@@ -48,5 +48,32 @@
     </div>
   </nav>
   <!-- ADD CODE HERE -->
+  <div class="container mt-4">
+    <h2>Your Game Library</h2>
+
+    <% if (games.length === 0) { %>
+      <div class="alert alert-warning mt-3">
+        You don't own any games yet. Visit the <a href="/vapourstore" class="alert-link">Vapour Store</a> to buy some!
+      </div>
+    <% } else { %>
+      <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+        <% games.forEach(function(game) { %>
+          <div class="col">
+            <div class="card h-100 bg-secondary text-white">
+              <% if (game.image) { %>
+                <img src="<%= game.image %>" class="card-img-top" alt="<%= game.title %> Cover">
+              <% } %>
+              <div class="card-body">
+                <h5 class="card-title"><%= game.title %></h5>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title"><% game.desc %></h5>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
 </body>
 </html>
