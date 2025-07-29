@@ -11,7 +11,7 @@
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Vapour Library</a>
+      <a class="navbar-brand" href="/">Vapourrrr Library</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -47,39 +47,6 @@
       </div>
     </div>
   </nav>
-  <div class="container mt-4">
-  <h2>Your Game Library</h2>
-
-  <% if (games.length === 0) { %>
-    <div class="alert alert-warning mt-3">
-      You don't own any games yet. Visit the <a href="/vapourstore" class="alert-link">Vapour Store</a> to buy some!
-    </div>
-  <% } else { %>
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
-      <% games.forEach(function(game) { %>
-        <div class="col">
-          <div class="card h-100 bg-secondary text-white">
-            <% if (game.imageUrl && game.imageUrl.trim() !== '') { %>
-              <img src="<%= game.imageUrl %>" class="card-img-top" alt="<%= game.title %> Cover">
-            <% } %>
-            <div class="card-body">
-              <h5 class="card-title"><%= game.title %></h5>
-              <p class="card-text">Publisher: <%= game.publisher %></p>
-
-              <form action="/editgames/<%= game.id %>" method="GET" class="d-inline me-2">
-                <button class="btn btn-outline-light btn-sm" type="submit">Edit</button>
-              </form>
-
-              <form action="/deletegames/<%= game.id %>" method="POST" class="d-inline">
-                <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      <% }) %>
-    </div>
-  <% } %>
-</div>
-
+  <!-- ADD CODE HERE -->
 </body>
 </html>
