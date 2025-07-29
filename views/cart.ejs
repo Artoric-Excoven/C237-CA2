@@ -58,20 +58,27 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Total</th>
+            <th>Remove</th>
           </tr>
         </thead>
         <tbody>
-          <% let total = 0; %>
-          <% for (let i = 0; i < cart.length; i++) { %>
-            <tr>
-                <td><%= cart[i].productName %></td>
-                <td><img src="/images/<%= cart[i].image %>" width="80" class="img-thumbnail"></td>
-                <td><%= cart[i].quantity %></td>
-                <td>$<%= (cart[i].price * cart[i].quantity).toFixed(2) %></td>
-            </tr>
-            <% total += cart[i].price * cart[i].quantity; %>
-          <% }; %>
-        </tbody>
+  <% let total = 0; %>
+  <% for (let i = 0; i < cart.length; i++) { %>
+    <tr>
+      <td><%= cart[i].productName %></td>
+      <td><img src="/images/<%= cart[i].image %>" width="80" class="img-thumbnail"></td>
+      <td><%= cart[i].quantity %></td>
+      <td>$<%= (cart[i].price * cart[i].quantity).toFixed(2) %></td>
+      <td>
+        <form action="/cart/remove/<%= cart[i].id %>" method="POST">
+          <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+        </form>
+      </td>
+    </tr>
+    <% total += cart[i].price * cart[i].quantity; %>
+  <% }; %>
+</tbody>
+
       </table>
       <h4>Total: $<%= total.toFixed(2) %></h4>
 
