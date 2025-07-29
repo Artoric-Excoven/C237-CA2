@@ -199,7 +199,7 @@ app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', { user: req.session.user } ); 
 });
 
-app.post('/addGame', upload.single('image'), (req, res) => {
+app.post('/addGame', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
   const { title, price, desc } = req.body;
   const imageUrl = req.file.path; // Cloudinary URL into DB
 
@@ -215,44 +215,34 @@ app.post('/addGame', upload.single('image'), (req, res) => {
 });
 
 
-app.get('/updateProduct/:id',checkAuthenticated, checkAdmin, (req,res) => {
-    const productId = req.params.id;
-    const sql = 'SELECT * FROM products WHERE productId = ?';
+app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
+    const gameId = req.params.id;
+    const sql = 'SELECT * FROM Games WHERE gameId = ?';
 
-    // Fetch data from MySQL based on the product ID
-    connection.query(sql , [productId], (error, results) => {
+    connection.query(sql , [gameId], (error, results) => {
         if (error) throw error;
 
-        // Check if any product with the given ID was found
         if (results.length > 0) {
-            // Render HTML page with the product data
-            res.render('updateProduct', { product: results[0] });
+            res.render('editGame', { game : results[0] });
         } else {
-            // If no product with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('Product not found');
+            res.status(404).send('Game not found');
         }
     });
 });
 
-app.post('/updateProduct/:id', upload.single('image'), checkAuthenticated, (req, res) => {
-    const productId = req.params.id;
-    // Extract product data from the request body
-    const { name, quantity, price } = req.body;
-    let image  = req.body.currentImage; //retrieve current image filename
-    if (req.file) { //if new image is uploaded
-        image = req.file.filename; // set image to be new image filename
-    } 
+app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
+    const gameId = req.params.id;
+    const { title, price, desc} = req.body;
+    const imageUrl = req.file.path;
 
-    const sql = 'UPDATE products SET productName = ? , quantity = ?, price = ?, image =? WHERE productId = ?';
-    // Insert the new product into the database
-    connection.query(sql, [name, quantity, price, image, productId], (error, results) => {
+    const sql = 'UPDATE Games SET title = ? , price = ?, `desc` = ?, image = ? WHERE gameId = ?';
+    connection.query(sql, [title, price, desc, imageUrl, gameId], (error, results) => {
         if (error) {
-            // Handle any error that occurs during the database operation
-            console.error("Error updating product:", error);
-            res.status(500).send('Error updating product');
+            console.error("Error updating game:", error);
+            res.status(500).send('Error updating game');
         } else {
             // Send a success response
-            res.redirect('/inventory');
+            res.redirect('/admin');
         }
     });
 });
