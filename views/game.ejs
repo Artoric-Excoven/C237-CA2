@@ -110,6 +110,22 @@
         <p><img src = "<%= game.image %>" width="20%"></p>
         <p><b>Description:</b><br> <%= game.desc %></p>
         <p><b>Price:</b><br> $<%= game.price %></p>
+
+        <% if (OwnedGame && user.id === OwnedGame.userId && OwnedGame.gameId === game.gameId) { %>
+  <button class="btn btn-success mt-3" disabled>Play</button>
+<% } else { %>
+  <form action="/add-to-cart" method="POST" class="d-inline">
+    <input type="hidden" name="gameId" value="<%= game.gameId %>">
+    <button type="submit" class="btn btn-warning mt-3 me-2">Add to Cart</button>
+  </form>
+
+  <form action="/buy" method="POST" class="d-inline">
+    <input type="hidden" name="gameId" value="<%= game.gameId %>">
+    <button type="submit" class="btn btn-primary mt-3">Buy Now</button>
+  </form>
+<% } %>
+
+
         <div class="container mb-4">
           <form action="/addComment" method="POST" class="comment-form mx-auto mb-4">
             <div class="mb-3">
@@ -134,5 +150,13 @@
         <a href ="/vapourstore">Back</a>
       <% } %>
   </div>
+
+  <script>
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
+    }
+  </script>
+  
 </body>
 </html>
