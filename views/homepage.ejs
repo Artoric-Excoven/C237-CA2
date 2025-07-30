@@ -217,43 +217,43 @@
       document.addEventListener('DOMContentLoaded', function () {
         const carousel1 = document.querySelector('#carousel1');
         const carousel2 = document.querySelector('#carousel2');
-      
+
         const carousel1Instance = new bootstrap.Carousel(carousel1);
         const carousel2Instance = new bootstrap.Carousel(carousel2);
-      
+
         carousel1.addEventListener('slide.bs.carousel', function (event) {
           carousel2Instance.to(event.to);
         });
-      
+
         carousel2.addEventListener('slide.bs.carousel', function (event) {
           carousel1Instance.to(event.to);
         });
       });
 
-    document.addEventListener('DOMContentLoaded', function () {
-      const carousel1 = document.querySelector('#carousel1');
-      const carousel2 = document.querySelector('#carousel2');
-      const linkButton = document.querySelector('.btn-primary');
+      document.addEventListener('DOMContentLoaded', function () {
+        const carousel1 = document.querySelector('#carousel1');
+        const carousel2 = document.querySelector('#carousel2');
+        const linkButton = document.querySelector('.btn-primary');
 
-      const carousel1Instance = new bootstrap.Carousel(carousel1);
-      const carousel2Instance = new bootstrap.Carousel(carousel2);
+        const carousel1Instance = new bootstrap.Carousel(carousel1);
+        const carousel2Instance = new bootstrap.Carousel(carousel2);
 
-      const bookLinks = [
+        const bookLinks = [
           'harrypotter.html',
           'unbroken.html',
           'wonder.html'
-      ];
+        ];
 
-      function updateLink(event) {
+        function updateLink(event) {
           linkButton.href = bookLinks[event.to];
-      }
+        }
 
-      carousel1.addEventListener('slide.bs.carousel', updateLink);
-      carousel2.addEventListener('slide.bs.carousel', updateLink);
+        carousel1.addEventListener('slide.bs.carousel', updateLink);
+        carousel2.addEventListener('slide.bs.carousel', updateLink);
 
-      // Initialize the link for the first displayed item
-      linkButton.href = bookLinks[0];
-    });
+        // Initialize the link for the first displayed item
+        linkButton.href = bookLinks[0];
+      });
 
     </script>
 

@@ -196,7 +196,7 @@
 
       const carousel1Instance = new bootstrap.Carousel(carousel1);
       const carousel2Instance = new bootstrap.Carousel(carousel2);
-      
+
       // UPDATE THIS PART TO LINK TO GAMES
       const bookLinks = [
         'harrypotter.html',
@@ -221,6 +221,12 @@
       // Set initial button link
       linkButton.href = bookLinks[0];
     });
+
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
+    }
+
   </script>
 </body>
 </html>
