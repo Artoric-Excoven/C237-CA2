@@ -175,11 +175,17 @@ app.get('/home', checkAuthenticated, (req, res) => {
 
     if (gamesId.length === 0) {
       if (error) throw error;
-      return res.render('home', { games: [], user: req.session.user });
+        connection.query('SELECT * FROM advertisements', (error, ads) => {
+          if (error) throw error;
+          return res.render('home', { games: [], user: req.session.user });
+        });
     } else {
       connection.query('SELECT * FROM Games WHERE gameId IN (?)', [gamesId], (error, results) => {
         if (error) throw error;
-        res.render('home', { games: results, user: req.session.user });
+        connection.query('SELECT * FROM advertisements', (error, ads) => {
+          if (error) throw error;
+          return res.render('home', { games: results, user: req.session.user, adverts: ads });
+        });
       });
     }
   });
