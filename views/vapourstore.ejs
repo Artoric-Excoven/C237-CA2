@@ -228,6 +228,11 @@
         linkButton.href = bookLinks[event.to];
       }
 
+      function submitTag(tagName) {
+        document.getElementById('tagInput').value = tagName;
+        document.getElementById('tagSearchForm').submit();
+      }
+
       carousel1.addEventListener('slide.bs.carousel', function (event) {
         carousel2Instance.to(event.to);
         updateLink(event);
