@@ -79,12 +79,16 @@
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
               Tag
             </a>
+            <form id="tagSearchForm" action="/tagSearch" method="POST" style="display:none;">
+              <input type="hidden" name="tag" id="tagInput">
+            </form>
+
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/search">Role-playing</a></li>
-              <li><a class="dropdown-item" href="/search">Action</a></li>
-              <li><a class="dropdown-item" href="/search">RPG</a></li>
-              <li><a class="dropdown-item" href="/search">Strategy</a></li>
-              <li><a class="dropdown-item" href="/search">Advanture</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Role-playing')">Role-playing</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Action')">Action</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('RPG')">RPG</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Strategy')">Strategy</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Adventure')">Adventure</a></li>
             </ul>
           </li>
 
@@ -163,6 +167,13 @@
       document.getElementById('left-ad').src = leftAd;
       document.getElementById('right-ad').src = rightAd;
     });
+
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
+    }
+
+
   </script>
 
 
