@@ -88,5 +88,13 @@
         <p class="text-center">No product found.</p>
       <% } %>
     </div>
+
+    <script>
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
+    }
+    </script>
+
   </body>
 </html>
