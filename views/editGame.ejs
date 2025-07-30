@@ -74,6 +74,19 @@
                         <input class="form-control rounded-3" type="file" id="image" name="image" accept="image/*">
                     </div>
 
+                    <div class="mb-3">
+                        <label for="tag" class="form-label fw-medium text-muted">Category</label>
+                        <select class="form-select form-select-lg rounded-3" id="category" name="category" required>
+                            <option value="" <%= !game.tag ? 'selected' : '' %>>Select a category</option>
+                            <option value="Action" <%= game.tag === 'Action' ? 'selected' : '' %>>Action</option>
+                            <option value="Adventure" <%= game.tag === 'Adventure' ? 'selected' : '' %>>Adventure</option>
+                            <option value="RPG" <%= game.tag === 'RPG' ? 'selected' : '' %>>RPG</option>
+                            <option value="Strategy" <%= game.tag === 'Strategy' ? 'selected' : '' %>>Strategy</option>
+                            <option value="Simulation" <%= game.tag === 'Simulation' ? 'selected' : '' %>>Simulation</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a category.</div>
+                    </div>
+
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary btn-lg rounded-3">Update Game</button>
                         <a href="/admin" class="btn btn-secondary btn-lg rounded-3 ms-2">Cancel</a>
