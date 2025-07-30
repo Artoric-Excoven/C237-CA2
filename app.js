@@ -196,7 +196,7 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
 
 app.get('/game/:title', checkAuthenticated, (req, res) => {
   const gameId = req.query.id
-  
+
   if (!gameId) {
     return res.status(400).send('Game ID not found');
   }
@@ -204,7 +204,9 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
       if (error) throw error;
       if (results.length > 0) {
-        res.render('game', { game: results[0], user: req.session.user  });
+        connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
+          res.render('game', { game: results[0], userComments: comments, user: req.session.user});
+        });
       } else {
         res.status(404).send('Game not found');
       }
@@ -239,7 +241,7 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
         if (error) throw error;
 
         if (results.length > 0) {
-            res.render('editGame', { game : results[0] });
+            res.render('editGame', { game : results[0], user: req.session.user });
         } else {
             res.status(404).send('Game not found');
         }
@@ -307,6 +309,7 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('admin', { Games: results, user: req.session.user})
   });
 })
+
 
 // -----------------------------------------------------------------------------------------------------
 
