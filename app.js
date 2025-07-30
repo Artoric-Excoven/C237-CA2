@@ -356,5 +356,24 @@ app.post('/buy', checkAuthenticated, (req, res) => {
   });
 });
 
+app.post('/addComment', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const gameId = req.body.gameId;
+  const username = req.session.user.username;
+  const comment = req.body.comment;
+
+  connection.query(
+    'INSERT INTO UserComments (userId, gameId, username, comment) VALUES (?, ?, ?, ?)', [userId, gameId, username, comment], (error, results) => {
+      if (error) {
+        console.error("Error adding comment:", error);
+        res.status(500).send('Error adding comment');
+      } else {
+        res.redirect(`/game/${encodeURIComponent(req.body.title)}?id=${gameId}`);
+      }
+    }
+  );
+});
+
+
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
