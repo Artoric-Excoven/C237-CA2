@@ -252,21 +252,28 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
 });
 
 app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
-    const gameId = req.params.id;
-    const { title, price, desc, image} = req.body;
+  const gameId = req.params.id;
+  const { title, price, desc } = req.body;
+  const imageUrl = req.file ? req.file.url : null;
 
+  let sql, params;
+  if (imageUrl) {
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ? WHERE gameId = ?';
+    params = [title, price, desc, imageUrl, gameId];
+  } else {
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ? WHERE gameId = ?';
+    params = [title, price, desc, gameId];
+  }
 
-    const sql = 'UPDATE Games SET title = ? , price = ?, `desc` = ?, image = ? WHERE gameId = ?';
-    connection.query(sql, [title, price, desc, image, gameId], (error, results) => {
-        if (error) {
-            console.error("Error updating game:", error);
-            res.status(500).send('Error updating game');
-        } else {
-            // Send a success response
-            res.redirect('/admin');
-        }
-    });
+  connection.query(sql, params, (error, results) => {
+    if (error) {
+      console.error("Error updating game:", error);
+      return res.status(500).send('Error updating game');
+    }
+    res.redirect('/admin');
+  });
 });
+
 
 app.get('/deleteGame/:id', checkAuthenticated, (req, res) => {
     const gameId = req.params.id;
