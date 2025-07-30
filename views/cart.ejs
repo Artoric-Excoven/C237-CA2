@@ -6,31 +6,54 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Vapour Library</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <div class="collapse navbar-collapse d-flex justify-content-between" id="collapsibleNavbar">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="/shopping">Shop</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/cart">View Cart</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
+            <a class="nav-link" href="/home">Home</a>
           </li> 
-        </ul>
+          <li class="nav-item">
+            <a class="nav-link" href="/vapourstore">Store</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              More
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+          </li>
+          <% if (user.role === "admin") { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/addGame">Add Game</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin">Admin Panel</a>
+            </li>
+          <% } %>
+        </ul>     
+        <form class="d-flex" role="search" action="/search" method="POST">
+          <input class="form-control me-2" type="search" name="query" placeholder="Search" required />
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
       </div>
     </div>
   </nav>
+  
   <!-- Cart Content -->
   <div class="container">
     <h2 class="mt-4">Shopping Cart</h2>
+    <!-- message -->
+    <% if (messages && messages.length> 0) { %>
+      <% messages.forEach(msg=> { %>
+        <div class="alert alert-success mt-2"><%= msg %></div>
+        <% }) %>
+          <% } %>
     <% if (cart.length === 0) { %>
       <p>Your cart is empty.</p>
     <% } else { %>
@@ -41,6 +64,7 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Total</th>
+            <th>Remove</th>
           </tr>
         </thead>
         <tbody>
@@ -57,6 +81,11 @@
         </tbody>
       </table>
       <h4>Total: $<%= total.toFixed(2) %></h4>
+
+      <!--Checkout button-->
+      <form action="/checkout" method="POST">
+        <button type="submit" class="btn btn-success">Checkout</button>
+      </form>
 
       <div class="mt-4">
         <a href="/shopping" class="btn btn-secondary">Back to Shopping</a>

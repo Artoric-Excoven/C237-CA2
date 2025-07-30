@@ -4,19 +4,23 @@ const mysql = require('mysql2');
 const session = require('express-session');
 const flash = require('connect-flash');
 const multer = require('multer');
+const path = require('path')
 const app = express();
 
-// Set up multer for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/images'); // Directory to save uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); 
-    }
+// cloudinary image storage (PAINFUL TO MAKE)
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('./config/cloudinary');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'game-images',
+    allowed_formats: ['jpg', 'png']
+  }
 });
 
 const upload = multer({ storage: storage });
+
 
 const connection = mysql.createConnection({
     host: '1yfliu.h.filess.io',
@@ -98,7 +102,11 @@ app.get('/',  (req, res) => {
 });
 
 app.get('/register', (req, res) => {
+  if (req.session.user) {
+    return res.redirect('/');
+  } else {
     res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
+  }
 });
 
 app.post('/register', validateRegistration, (req, res) => {
@@ -117,7 +125,11 @@ app.post('/register', validateRegistration, (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { messages: req.flash('success'), errors: req.flash('error') });
+  if (req.session.user) {
+      return res.redirect('/');
+  } else {
+    res.render('login', { user: req.session.user, messages: req.flash('success'), errors: req.flash('error') });
+  }
 });
 
 app.post('/login', (req, res) => {
@@ -154,9 +166,25 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get('/home',  (req, res) => {
-    res.render('home', {user: req.session.user} );
+app.get('/home', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+
+  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, gamesOwned) => {
+    if (error) throw error;
+    const gamesId = gamesOwned.map(row => row.gameId);
+
+    if (gamesId.length === 0) {
+      if (error) throw error;
+      return res.render('home', { games: [], user: req.session.user });
+    } else {
+      connection.query('SELECT * FROM Games WHERE gameId IN (?)', [gamesId], (error, results) => {
+        if (error) throw error;
+        res.render('home', { games: results, user: req.session.user });
+      });
+    }
+  });
 });
+
 
 app.get('/vapourstore', checkAuthenticated, (req,res) => {
   // Fetch data from MySQL
@@ -168,7 +196,7 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
 
 app.get('/game/:title', checkAuthenticated, (req, res) => {
   const gameId = req.query.id
-  
+
   if (!gameId) {
     return res.status(400).send('Game ID not found');
   }
@@ -176,7 +204,9 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
       if (error) throw error;
       if (results.length > 0) {
-        res.render('game', { game: results[0], user: req.session.user  });
+        connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
+          res.render('game', { game: results[0], userComments: comments, user: req.session.user});
+        });
       } else {
         res.status(404).send('Game not found');
       }
@@ -184,67 +214,53 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
 });
 
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
-  res.render('addGame', {user: req.session.user } ); 
+  res.render('addGame', { user: req.session.user } ); 
 });
 
-app.post('/addGame', upload.single('image'),  (req, res) => {
-    const { title, price, desc } = req.body;
-    let image;
-    if (req.file) {
-        image = req.file.filename;
+app.post('/addGame', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
+  const { title, price, desc } = req.body;
+  const imageUrl = req.file.path; // Cloudinary URL into DB
+
+  const sql = 'INSERT INTO Games (title, price, `desc`, image) VALUES (?, ?, ?, ?)';
+  connection.query(sql, [title, price, desc, imageUrl], (error, results) => {
+    if (error) {
+      console.error("Error adding game:", error);
+      res.status(500).send('Error adding game');
     } else {
-        image = null;
+      res.redirect('/vapourStore');
     }
-
-    const sql = 'INSERT INTO Games (title, price, `desc`, image) VALUES (?, ?, ?, ?)';
-    connection.query(sql , [title, price, desc, image], (error, results) => {
-        if (error) {
-            console.error("Error adding game:", error);
-            res.status(500).send('Error adding game');
-        } else {
-            res.redirect('/vapourStore');
-        }
-    });
+  });
 });
 
-app.get('/updateProduct/:id',checkAuthenticated, checkAdmin, (req,res) => {
-    const productId = req.params.id;
-    const sql = 'SELECT * FROM products WHERE productId = ?';
 
-    // Fetch data from MySQL based on the product ID
-    connection.query(sql , [productId], (error, results) => {
+app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
+    const gameId = req.params.id;
+    const sql = 'SELECT * FROM Games WHERE gameId = ?';
+
+    connection.query(sql , [gameId], (error, results) => {
         if (error) throw error;
 
-        // Check if any product with the given ID was found
         if (results.length > 0) {
-            // Render HTML page with the product data
-            res.render('updateProduct', { product: results[0] });
+            res.render('editGame', { game : results[0] });
         } else {
-            // If no product with the given ID was found, render a 404 page or handle it accordingly
-            res.status(404).send('Product not found');
+            res.status(404).send('Game not found');
         }
     });
 });
 
-app.post('/updateProduct/:id', upload.single('image'), checkAuthenticated, (req, res) => {
-    const productId = req.params.id;
-    // Extract product data from the request body
-    const { name, quantity, price } = req.body;
-    let image  = req.body.currentImage; //retrieve current image filename
-    if (req.file) { //if new image is uploaded
-        image = req.file.filename; // set image to be new image filename
-    } 
+app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
+    const gameId = req.params.id;
+    const { title, price, desc} = req.body;
+    const imageUrl = req.file.path;
 
-    const sql = 'UPDATE products SET productName = ? , quantity = ?, price = ?, image =? WHERE productId = ?';
-    // Insert the new product into the database
-    connection.query(sql, [name, quantity, price, image, productId], (error, results) => {
+    const sql = 'UPDATE Games SET title = ? , price = ?, `desc` = ?, image = ? WHERE gameId = ?';
+    connection.query(sql, [title, price, desc, imageUrl, gameId], (error, results) => {
         if (error) {
-            // Handle any error that occurs during the database operation
-            console.error("Error updating product:", error);
-            res.status(500).send('Error updating product');
+            console.error("Error updating game:", error);
+            res.status(500).send('Error updating game');
         } else {
             // Send a success response
-            res.redirect('/inventory');
+            res.redirect('/admin');
         }
     });
 });
@@ -269,9 +285,23 @@ app.get('/searchResults', checkAuthenticated, (req, res) => {
 
 app.post('/search', checkAuthenticated, (req, res) => {
   const searchQuery = req.body.query;
-  // Perform search logic here (e.g., query database)
-  res.render('searchResults', { user: req.session.user, query: searchQuery });
+  const sqlQuery = 'SELECT * FROM Games WHERE title LIKE ?';
+  const searchTerm = `%${searchQuery}%`;
+
+  connection.query(sqlQuery, [searchTerm], (error, results) => {
+    if (error) {
+      console.error("Error finding game(s):", error);
+      res.status(500).send('Error finding game(s)');
+    } else {
+      res.render('searchResults', {
+        user: req.session.user,
+        query: searchQuery,
+        Games: results
+      });
+    }
+  });
 });
+
 
 app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   connection.query('SELECT * FROM Games', (error, results) => {
@@ -279,6 +309,7 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('admin', { Games: results, user: req.session.user})
   });
 })
+
 
 // -----------------------------------------------------------------------------------------------------
 
@@ -497,6 +528,70 @@ app.post('/restore', (req, res) => {
   }
   res.redirect('/games');
 });
+// -------------CART ------------------- //
+app.use((req, res, next) => {
+  if (!req.session.cart) {
+    req.session.cart = [];
+  }
+  next();
+});
+
+app.get('/cart', checkAuthenticated, (req,res) => {
+  res.render('cart', {
+    user: req.session.user, 
+    cart: req.session.cart,
+    messages: req.flash('Success')
+  });
+});
+
+app.post('/addcart', checkAuthenticated, (req, res) =>  {
+  const { gameId, productName, price, image} = req.body;
+  let cart = req.session.cart;
+  let found = false;
+
+  for (let i = 0; i < cart.length; i++) {
+    if (cart[i].gameId == gameId) {
+      cart[i].quantity += 1;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    cart.push({
+      gameId: gameId,
+      productName: productName,
+      price: parseFloat(price),
+      image: image,
+      quantity: 1
+    });
+  }
+
+  res.redirect('/cart');
+});
+
+app.post('/removefromcart', checkAuthenticated, (req, res) => {
+  const { gameId } = req.body;
+
+  const cart = req.session.cart;
+
+  for (let i = 0; i < cart.length; i++) {
+    if (cart[i].gameId === gameId) {
+      cart.splice(i, 1);
+      break;
+    }
+  }
+
+  res.redirect('/cart');
+});
+
+app.post('/checkout', checkAuthenticated, (req,res) => {
+  req.session.cart = [];
+  req.flash('Success', 'Checkout successful! Thank you for your purchase.');
+  res.redirect('/cart');
+});
+//-------------CART ------------------- //
+
 
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
