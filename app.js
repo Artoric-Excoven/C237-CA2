@@ -255,17 +255,26 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
 
 app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
   const gameId = req.params.id;
-  const { title, price, desc, tag } = req.body;
-  const imageUrl = req.file ? req.file.url : null;
+  const { title, price, desc, tag, existingImage } = req.body;
 
-  let sql, params;
-  if (imageUrl) {
-    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag =? WHERE gameId = ?';
+  const imageUrl = req.file ? req.file.path : existingImage;
+
+  let sql = '';
+  let params = [];
+
+  if (imageUrl !== existingImage) {
+    // Image changed
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag = ? WHERE gameId = ?';
     params = [title, price, desc, imageUrl, tag, gameId];
   } else {
+    // No image change
     sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, tag = ? WHERE gameId = ?';
     params = [title, price, desc, tag, gameId];
   }
+
+  // Log SQL for debugging
+  console.log("SQL:", sql);
+  console.log("Params:", params);
 
   connection.query(sql, params, (error, results) => {
     if (error) {
@@ -275,6 +284,7 @@ app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin
     res.redirect('/admin');
   });
 });
+
 
 
 app.get('/deleteGame/:id', checkAuthenticated, (req, res) => {

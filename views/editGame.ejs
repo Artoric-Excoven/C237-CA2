@@ -87,7 +87,7 @@
                         <textarea class="form-control rounded-3" id="desc" name="desc" rows="4" required><%= game.desc %></textarea>
                         <div class="invalid-feedback">Please enter a description.</div>
                     </div>
-
+                    <input type="hidden" name="existingImage" value="<%= game.image %>">
                     <div class="mb-4">
                         <label for="image" class="form-label fw-medium text-muted">Game Image</label>
                         <img src="<%= game.image %>" class="img-thumbnail mb-3 img-fluid rounded-3" style="max-width: 150px;" alt="Cover image for <%= game.title %>">
