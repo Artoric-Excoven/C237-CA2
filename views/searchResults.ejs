@@ -1,13 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>Vapour Library</title>
-</head>
+  <style>
+    body {
+      background-color: #1b2838;
+      color: #fff;
+    }
 
+    .game-image {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .game-image:hover {
+      transform: scale(1.03);
+    }
+
+    .game-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .game-card {
+      margin-bottom: 30px;
+    }
+
+    .card-summary {
+      background-color: #2a475e;
+      color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px #000;
+    }
+  </style>
+</head>
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
@@ -17,49 +53,34 @@
       </button>
       <div class="collapse navbar-collapse d-flex justify-content-between" id="collapsibleNavbar">
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/home">Home</a>
-          </li> 
-          <li class="nav-item">
-            <a class="nav-link" href="/vapourstore">Store</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/cart">Cart</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="/home">Home</a></li> 
+          <li class="nav-item"><a class="nav-link" href="/vapourstore">Store</a></li>
+          <li class="nav-item"><a class="nav-link" href="/cart">Cart</a></li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              More
-            </a>
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">More</a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/logout">Logout</a></li>
             </ul>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                Tag
-            </a>
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Tag</a>
             <form id="tagSearchForm" action="/tagSearch" method="POST" style="display:none;">
-                <input type="hidden" name="tag" id="tagInput">
+              <input type="hidden" name="tag" id="tagInput">
             </form>
-
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" onclick="submitTag('Role-playing')">Role-playing</a></li>
-                <li><a class="dropdown-item" href="#" onclick="submitTag('Action')">Action</a></li>
-                <li><a class="dropdown-item" href="#" onclick="submitTag('RPG')">RPG</a></li>
-                <li><a class="dropdown-item" href="#" onclick="submitTag('Strategy')">Strategy</a></li>
-                <li><a class="dropdown-item" href="#" onclick="submitTag('Adventure')">Adventure</a></li>
-                <li><a class="dropdown-item" href="#" onclick="submitTag('Other/Misc')">Other/Misc</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Role-playing')">Role-playing</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Action')">Action</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('RPG')">RPG</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Strategy')">Strategy</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Adventure')">Adventure</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Other/Misc')">Other/Misc</a></li>
             </ul>
-        </li>
+          </li>
           <% if (user.role === "admin") { %>
-            <li class="nav-item">
-              <a class="nav-link" href="/addGame">Add Game</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/admin">Admin Panel</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="/addGame">Add Game</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin">Admin Panel</a></li>
           <% } %>
-        </ul>     
+        </ul>
         <form class="d-flex" role="search" action="/search" method="POST">
           <input class="form-control me-2" type="search" name="query" placeholder="Search" required />
           <button class="btn btn-outline-success" type="submit">Search</button>
@@ -67,39 +88,27 @@
       </div>
     </div>
   </nav>
-  
-  <div class="container text-center">
+
+  <div class="container mt-5">
+    <div class="text-center mb-4">
+      <h3>Search: <%= query %></h3>
+    </div>
+
+    <div class="card-summary text-center mb-5">
+      <h5><u>Total Games</u></h5>
+      <p class="fs-4"><%= Games.length %></p>
+    </div>
+
     <div class="row">
-      <div class="col">
-        <h3>Search: <%= query %></h3>
-      </div>
-    </div>
-    <div class="mb-4">
-    <div class="card text-bg-info">
-      <div class="card-body">
-        <h5 class="card-title"><u>Total Games</u></uTotal></h5>
-          <p class="card-text fs-4"><%= Games.length %></p>
+      <% for (let i = 0; i < Games.length; i++) { %>
+        <div class="col-md-3 col-sm-6 game-card text-center">
+          <a href="/game/<%= encodeURIComponent(Games[i].title) %>?id=<%= Games[i].gameId %>">
+            <img src="<%= Games[i].image %>" alt="<%= Games[i].title %>" class="game-image">
+          </a>
+          <p class="game-title"><%= Games[i].title %></p>
         </div>
-      </div>
+      <% } %>
     </div>
-    <% for (let i = 0; i < Games.length; i += 4) { %>
-      <div class="row">
-        <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
-          <div class="col-3 d-flex justify-content-center">
-            <a href="/game/<%= encodeURIComponent(Games[j].title) %>?id=<%= Games[j].gameId %>">
-              <img src="<%= Games[j].image %>" alt="<%= Games[j].title %>" width="320" height="240">
-            </a>
-          </div>
-        <% } %>
-      </div>
-      <div class="row">
-        <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
-          <div class="col-3 d-flex justify-content-center">
-            <p><%= Games[j].title %></p>
-          </div>
-        <% } %>
-      </div>
-    <% } %>
   </div>
 
   <script>
@@ -108,6 +117,5 @@
       document.getElementById('tagSearchForm').submit();
     }
   </script>
-  
 </body>
 </html>
