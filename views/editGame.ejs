@@ -96,7 +96,7 @@
 
                     <div class="mb-3">
                         <label for="tag" class="form-label fw-medium text-muted">Category</label>
-                        <select class="form-select form-select-lg rounded-3" id="category" name="category" required>
+                        <select class="form-select form-select-lg rounded-3" id="tag" name="tag" required>
                             <option value="" <%= !game.tag ? 'selected' : '' %>>Select a category</option>
                             <option value="Action" <%= game.tag === 'Action' ? 'selected' : '' %>>Action</option>
                             <option value="Adventure" <%= game.tag === 'Adventure' ? 'selected' : '' %>>Adventure</option>
