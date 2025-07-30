@@ -23,6 +23,19 @@
     .form-label {
       color: #c7d5e0;
     }
+
+    .form-control {
+      background-color: #1b2838;    
+      color: #ffffff;               
+      border: 1px solid #66c0f4;    
+    }
+    .form-control:focus {
+      background-color: #1b2838;
+      color: #ffffff;
+      border-color: #8acde9;      
+      box-shadow: 0 0 0 0.2rem rgba(102, 192, 244, 0.25);
+    }
+
   
     .btn-login {
       background-color: #66c0f4;
@@ -89,7 +102,7 @@
   <!-- Main Content -->
   <div class="d-flex justify-content-center align-items-center" style="height: 90vh;">
     <div class="login-container">
-      <h2 class="text-center mb-4">🎮Add New Game🎮</h2>>
+      <h2 class="text-center mb-4">🎮Add New Game🎮</h2>
       <form action="/addGame" method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 500px;">
   
         <div class="mb-3">
@@ -114,7 +127,7 @@
         </div>
   
         <div class="d-grid">
-          <button type="submit" class="btn btn-primary">Add Game</button>
+          <button type="submit" class="btn btn-login">Add Game</button>
         </div>
   
       </form>
