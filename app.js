@@ -192,32 +192,29 @@ app.get('/home', checkAuthenticated, (req, res) => {
 });
 
 
-app.get('/vapourstore', checkAuthenticated, (req,res) => {
-  // Fetch data from MySQL
-    connection.query('SELECT * FROM Games', (error, results) => {
+app.get('/home', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+
+  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, gamesOwned) => {
+    if (error) throw error;
+    const gamesId = gamesOwned.map(row => row.gameId);
+
+    connection.query('SELECT * FROM advertisements', (error, ads) => {
       if (error) throw error;
-      res.render('vapourstore', { Games: results, user: req.session.user})
-    });
-});
 
-app.get('/game/:title', checkAuthenticated, (req, res) => {
-  const gameId = req.query.id
-
-  if (!gameId) {
-    return res.status(400).send('Game ID not found');
-  }
-
-  connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
-      if (error) throw error;
-      if (results.length > 0) {
-        connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
-          res.render('game', { game: results[0], userComments: comments, user: req.session.user});
-        });
+      if (gamesId.length === 0) {
+        return res.render('home', { games: [], user: req.session.user, adverts: ads });
       } else {
-        res.status(404).send('Game not found');
+        connection.query('SELECT * FROM Games WHERE gameId IN (?)', [gamesId], (error, results) => {
+          if (error) throw error;
+          return res.render('home', { games: results, user: req.session.user, adverts: ads });
+        });
       }
+    });
   });
 });
+
+
 
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', { user: req.session.user } ); 
