@@ -167,12 +167,24 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/home', checkAuthenticated, (req, res) => {
-  const userId = req.session.user.id
-  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, results) => {
+  const userId = req.session.user.id;
+
+  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, gamesOwned) => {
     if (error) throw error;
-    res.render('home', {games: results, user: req.session.user} );
+    const gamesId = gamesOwned.map(row => row.gameId);
+
+    if (gamesId.length === 0) {
+      if (error) throw error;
+      return res.render('home', { games: [], user: req.session.user });
+    } else {
+      connection.query('SELECT * FROM Games WHERE gameId IN (?)', [gamesId], (error, results) => {
+        if (error) throw error;
+        res.render('home', { games: results, user: req.session.user });
+      });
+    }
   });
 });
+
 
 app.get('/vapourstore', checkAuthenticated, (req,res) => {
   // Fetch data from MySQL
@@ -521,6 +533,70 @@ app.post('/restore', (req, res) => {
   }
   res.redirect('/games');
 });
+// -------------CART ------------------- //
+app.use((req, res, next) => {
+  if (!req.session.cart) {
+    req.session.cart = [];
+  }
+  next();
+});
+
+app.get('/cart', checkAuthenticated, (req,res) => {
+  res.render('cart', {
+    user: req.session.user, 
+    cart: req.session.cart,
+    messages: req.flash('Success')
+  });
+});
+
+app.post('/addcart', checkAuthenticated, (req, res) =>  {
+  const { gameId, productName, price, image} = req.body;
+  let cart = req.session.cart;
+  let found = false;
+
+  for (let i = 0; i < cart.length; i++) {
+    if (cart[i].gameId == gameId) {
+      cart[i].quantity += 1;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    cart.push({
+      gameId: gameId,
+      productName: productName,
+      price: parseFloat(price),
+      image: image,
+      quantity: 1
+    });
+  }
+
+  res.redirect('/cart');
+});
+
+app.post('/removefromcart', checkAuthenticated, (req, res) => {
+  const { gameId } = req.body;
+
+  const cart = req.session.cart;
+
+  for (let i = 0; i < cart.length; i++) {
+    if (cart[i].gameId === gameId) {
+      cart.splice(i, 1);
+      break;
+    }
+  }
+
+  res.redirect('/cart');
+});
+
+app.post('/checkout', checkAuthenticated, (req,res) => {
+  req.session.cart = [];
+  req.flash('Success', 'Checkout successful! Thank you for your purchase.');
+  res.redirect('/cart');
+});
+//-------------CART ------------------- //
+
 
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
