@@ -377,7 +377,7 @@ app.post('/addToCart', checkAuthenticated, (req, res) => {
   connection.query(checkSql, [userId, gameId], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Server error');
+      return res.status(500).send('Server errorrr');
     }
 
     if (results.length > 0) {
@@ -390,7 +390,7 @@ app.post('/addToCart', checkAuthenticated, (req, res) => {
     connection.query(insertSql, [userId, gameId], (err2, insertResult) => {
       if (err2) {
         console.error(err2);
-        return res.status(500).send('Server error');
+        return res.status(500).send('Serverrrr error');
       }
 
       res.redirect('/cart');
