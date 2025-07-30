@@ -69,6 +69,24 @@
               <li><a class="dropdown-item" href="/logout">Logout</a></li>
             </ul>
           </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              Tag
+            </a>
+            <form id="tagSearchForm" action="/tagSearch" method="POST" style="display:none;">
+              <input type="hidden" name="tag" id="tagInput">
+            </form>
+
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Role-playing')">Role-playing</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Action')">Action</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('RPG')">RPG</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Strategy')">Strategy</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Adventure')">Adventure</a></li>
+            </ul>
+          </li>
+          
           <% if (user.role === "admin") { %>
             <li class="nav-item">
               <a class="nav-link" href="/addGame">Add Game</a>
@@ -122,27 +140,26 @@
         </div>
       </div>
 
-      <div class="col">
-        <div class="card h-100">
-          <a class="btn btn-primary" href="#" role="button">Click here for more info</a>
-          <div class="carousel-size">
-            <div id="carousel2" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-inner">
-                <div class="carousel-item active" data-bs-interval="10000">
-                  <div>Description<br>Undertale is a 2015 role-playing video game created by American indie developer Toby Fox. The player controls a child who has fallen into the Underground: a large, secluded region under the surface of the Earth, separated by a magical barrier</div>
+      <div class="col mb-4">
+                <div class="card h-100">
+                    <a class="btn btn-primary mb-2" href="/vapourstore" role="button">Click here for more games</a>
+                    <div class="carousel-size">
+                        <div id="carouselFeaturedGames" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <% Games.forEach((game, index) => { %>
+                                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>" data-bs-interval="10000">
+                                        <div>
+                                            <strong><%= game.title %></strong><br>
+                                            <%= game.desc %>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="carousel-item" data-bs-interval="10000">
-                  <div>Description<br>Outer Wilds is a 2019 action-adventure game developed by Mobius Digital and published by Annapurna Interactive. The game follows the player character as they explore a planetary system stuck in a 22-minute time loop that resets after the sun goes supernova and destroys the system.</div>
-                </div>
-                <div class="carousel-item" data-bs-interval="10000">
-                  <div>Description<br>Kill Nam, the one who betrayed our glorious KIM JUNG UN</div>
-                </div>
-              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+
   </section>
 
   <section>
@@ -182,7 +199,7 @@
 
       const carousel1Instance = new bootstrap.Carousel(carousel1);
       const carousel2Instance = new bootstrap.Carousel(carousel2);
-      
+
       // UPDATE THIS PART TO LINK TO GAMES
       const bookLinks = [
         'harrypotter.html',
@@ -207,6 +224,12 @@
       // Set initial button link
       linkButton.href = bookLinks[0];
     });
+
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
+    }
+
   </script>
 </body>
 </html>

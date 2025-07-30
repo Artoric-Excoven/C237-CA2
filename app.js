@@ -312,6 +312,23 @@ app.post('/search', checkAuthenticated, (req, res) => {
   });
 });
 
+app.post('/tagSearch', checkAuthenticated, (req, res) => {
+  const tag = req.body.tag;
+
+  connection.query('SELECT * FROM Games WHERE tag = ?', [tag], (error, results) => {
+    if (error) {
+      console.error("Error finding game(s):", error);
+      res.status(500).send('Error finding game(s)');
+    } else {
+      res.render('searchResults', {
+        user: req.session.user,
+        query: tag,
+        Games: results
+      });
+    }
+  });
+});
+
 
 app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   connection.query('SELECT * FROM Games', (error, results) => {

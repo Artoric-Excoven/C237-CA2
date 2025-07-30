@@ -70,7 +70,7 @@
         <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" href="/home">Home</a>
-          </li> 
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="/vapourstore">Store</a>
           </li>
@@ -82,14 +82,30 @@
               <li><a class="dropdown-item" href="/logout">Logout</a></li>
             </ul>
           </li>
-          <% if (user.role === "admin") { %>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              Tag
+            </a>
+            <form id="tagSearchForm" action="/tagSearch" method="POST" style="display:none;">
+              <input type="hidden" name="tag" id="tagInput">
+            </form>
+
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Role-playing')">Role-playing</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Action')">Action</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('RPG')">RPG</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Strategy')">Strategy</a></li>
+              <li><a class="dropdown-item" href="#" onclick="submitTag('Adventure')">Adventure</a></li>
+            </ul>
+          </li>
+          <% if (user.role==="admin" ) { %>
             <li class="nav-item">
               <a class="nav-link" href="/addGame">Add Game</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/admin">Admin Panel</a>
             </li>
-          <% } %>
+            <% } %>
         </ul>
         <form class="d-flex" role="search" action="/search" method="POST">
           <input class="form-control me-2" type="search" name="query" placeholder="Search" required />
@@ -125,6 +141,20 @@
           <label for="image" class="form-label">Game Image</label>
           <input class="form-control" type="file" id="image" name="image" accept="image/*" required>
         </div>
+
+        <div class="mb-3">
+            <label for="tag" class="form-label fw-medium text-muted">Category</label>
+            <select class="form-select form-select-lg rounded-3" id="category" name="category" required>
+                <option value="" <%= !game.tag ? 'selected' : '' %>>Select a category</option>
+                <option value="Action" <%= game.tag === 'Action' ? 'selected' : '' %>>Action</option>
+                <option value="Adventure" <%= game.tag === 'Adventure' ? 'selected' : '' %>>Adventure</option>
+                <option value="RPG" <%= game.tag === 'RPG' ? 'selected' : '' %>>RPG</option>
+                <option value="Strategy" <%= game.tag === 'Strategy' ? 'selected' : '' %>>Strategy</option>
+                <option value="Simulation" <%= game.tag === 'Simulation' ? 'selected' : '' %>>Simulation</option>
+                <option value="Other/Misc" <%= game.tag === 'Other/Misc' ? 'selected' : '' %>>Other/Misc</option>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
+        </div>
   
         <div class="d-grid">
           <button type="submit" class="btn btn-login">Add Game</button>
@@ -132,6 +162,12 @@
   
       </form>
     </div>
-  </div>
+    </div>
+    <script>
+      function submitTag(tag) {
+        document.getElementById('tagInput').value = tag;
+        document.getElementById('tagSearchForm').submit();
+      }
+    </script>
 </body>
 </html>
