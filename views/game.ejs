@@ -47,22 +47,24 @@
     </div>
   </nav>
 
-    <div class="container">
-        <p>Welcome, <%= user.username %> (<%= user.role %>)</p>
-        <br>
-        <div class="text-center"><h2>Game Details</h2></div>
-        <br>
-        <% if (game) { %>
-                <p><b>Title:</b><br> <%= game.title %></p>
-                <p><img src = "<%= game.image %>" width="20%"></p>
-                <p><b>Description:</b><br> <%= game.desc %></p>
-                <p><b>Price:</b><br> $<%= game.price %></p> 
-            </div>
-        <% } else { %>
-          <p>No game found.</p>
-          <a href ="/vapourstore">Back</a>
-        <% } %>
-    </div>
+  <div class="container">
+      <p>Welcome, <%= user.username %> (<%= user.role %>)</p>
+      <br>
+      <div class="text-center"><h2>Game Details</h2></div>
+      <br>
+      <% if (game) { %>
+        <p><b>Title:</b><br> <%= game.title %></p>
+        <p><img src = "<%= game.image %>" width="20%"></p>
+        <p><b>Description:</b><br> <%= game.desc %></p>
+        <p><b>Price:</b><br> $<%= game.price %></p>
+        <div class="container mb-4">
+          <% <p></p> %>
+        </div>
+      <% } else { %>
+        <p>No game found.</p>
+        <a href ="/vapourstore">Back</a>
+      <% } %>
+  </div>
     
 </body>
 </html>
