@@ -211,38 +211,46 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const carousel1 = document.querySelector('#carousel1');
-    const carousel2 = document.querySelector('#carousel2');
-    const linkButton = document.querySelector('.btn-primary');
+      const carousel1 = document.querySelector('#carousel1');
+      const carousel2 = document.querySelector('#carousel2');
+      const linkButton = document.querySelector('.btn-primary');
 
-    const carousel1Instance = new bootstrap.Carousel(carousel1);
-    const carousel2Instance = new bootstrap.Carousel(carousel2);
+      const carousel1Instance = new bootstrap.Carousel(carousel1);
+      const carousel2Instance = new bootstrap.Carousel(carousel2);
 
-const games = "<%= JSON.stringify(Games) =%>";
+      const bookLinks = [
+        'harrypotter.html',
+        'unbroken.html',
+        'wonder.html'
+      ];
 
-    function updateLink(event) {
-      const game = games[event.to];
-      linkButton.href = `/game/${encodeURIComponent(game.title)}?id=${game.gameId}`;
+      function updateLink(event) {
+        linkButton.href = bookLinks[event.to];
+      }
+
+      function submitTag(tagName) {
+        document.getElementById('tagInput').value = tagName;
+        document.getElementById('tagSearchForm').submit();
+      }
+
+      carousel1.addEventListener('slide.bs.carousel', function (event) {
+        carousel2Instance.to(event.to);
+        updateLink(event);
+      });
+
+      carousel2.addEventListener('slide.bs.carousel', function (event) {
+        carousel1Instance.to(event.to);
+        updateLink(event);
+      });
+
+      linkButton.href = bookLinks[0];
+    });
+
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
     }
-
-    carousel1.addEventListener('slide.bs.carousel', function (event) {
-      carousel2Instance.to(event.to);
-      updateLink(event);
-    });
-
-    carousel2.addEventListener('slide.bs.carousel', function (event) {
-      carousel1Instance.to(event.to);
-      updateLink(event);
-    });
-
-    // Set initial link
-    linkButton.href = `/game/${encodeURIComponent(games[0].title)}?id=${games[0].gameId}`;
-  });
-
-  function submitTag(tag) {
-    document.getElementById('tagInput').value = tag;
-    document.getElementById('tagSearchForm').submit();
-  }
   </script>
 </body>
 </html>
+
