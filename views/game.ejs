@@ -225,10 +225,11 @@
       <% if (userOwnsGame) { %>
         <button class="btn btn-success mt-3" disabled>Play</button>
       <% } else { %>
-        <form action="/addToCart" method="POST" class="d-inline">
-          <input type="hidden" name="gameId" value="<%= game.gameId %>">
-          <button type="submit" class="btn btn-warning mt-3 me-2">Add to Cart</button>
-        </form>
+      <form action="/addToCart" method="POST">
+        <input type="hidden" name="gameId" value="<%= game.gameId %>">
+        <button type="submit" class="btn btn-warning">Add to Cart</button>
+      </form>
+
         <form action="/buy" method="POST" class="d-inline">
           <input type="hidden" name="gameId" value="<%= game.gameId %>">
           <button type="submit" class="btn btn-primary mt-3">Buy Now</button>
