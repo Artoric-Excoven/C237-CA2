@@ -398,6 +398,32 @@ app.post('/addToCart', (req, res) => {
   });
 });
 
+app.get('/cart', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+
+  // Query UserGames where purchaseDate IS NULL (i.e., items in cart)
+  const sql = `
+    SELECT UG.gameId, G.title AS productName, G.price, G.image, COUNT(*) AS quantity
+    FROM UserGames UG
+    JOIN Games G ON UG.gameId = G.gameId
+    WHERE UG.userId = ? AND UG.purchaseDate IS NULL
+    GROUP BY UG.gameId, G.title, G.price, G.image
+  `;
+
+  connection.query(sql, [userId], (err, cartItems) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+
+    // Pass any flash messages (optional)
+    const messages = req.flash('success');
+
+    res.render('cart', { cart: cartItems, user: req.session.user, messages });
+  });
+});
+
+
 
 
 app.post('/buy', checkAuthenticated, (req, res) => {
