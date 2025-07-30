@@ -126,9 +126,18 @@
           <input class="form-control" type="file" id="image" name="image" accept="image/*" required>
         </div>
 
-        <div class="mb-4">
-          <label for="tag" class="form-label">Game Tag</label>
-          <input class="form-control" type="text" id="tag" name="tag" required>
+        <div class="mb-3">
+            <label for="tag" class="form-label fw-medium text-muted">Category</label>
+            <select class="form-select form-select-lg rounded-3" id="category" name="category" required>
+                <option value="" <%= !game.tag ? 'selected' : '' %>>Select a category</option>
+                <option value="Action" <%= game.tag === 'Action' ? 'selected' : '' %>>Action</option>
+                <option value="Adventure" <%= game.tag === 'Adventure' ? 'selected' : '' %>>Adventure</option>
+                <option value="RPG" <%= game.tag === 'RPG' ? 'selected' : '' %>>RPG</option>
+                <option value="Strategy" <%= game.tag === 'Strategy' ? 'selected' : '' %>>Strategy</option>
+                <option value="Simulation" <%= game.tag === 'Simulation' ? 'selected' : '' %>>Simulation</option>
+                <option value="Other/Misc" <%= game.tag === 'Other/Misc' ? 'selected' : '' %>>Other/Misc</option>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
         </div>
   
         <div class="d-grid">
