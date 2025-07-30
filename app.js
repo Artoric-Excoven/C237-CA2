@@ -253,11 +253,11 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
 
 app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
     const gameId = req.params.id;
-    const { title, price, desc} = req.body;
-    const imageUrl = req.file.path;
+    const { title, price, desc, image} = req.body;
+
 
     const sql = 'UPDATE Games SET title = ? , price = ?, `desc` = ?, image = ? WHERE gameId = ?';
-    connection.query(sql, [title, price, desc, imageUrl, gameId], (error, results) => {
+    connection.query(sql, [title, price, desc, image, gameId], (error, results) => {
         if (error) {
             console.error("Error updating game:", error);
             res.status(500).send('Error updating game');
