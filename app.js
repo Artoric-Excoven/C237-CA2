@@ -368,7 +368,7 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   });
 })
 
-app.post('/addToCart', (req, res) => {
+app.post('/addToCart', checkAuthenticated, (req, res) => {
   const userId = req.session.user.id;
   const gameId = req.body.gameId;
 
