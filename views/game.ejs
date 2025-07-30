@@ -254,13 +254,15 @@
         <% } %>
 
 
-        <div class="container mb-4">
           <form action="/addComment" method="POST" class="comment-form mx-auto mb-4">
+            <input type="hidden" name="gameId" value="<%= game.gameId %>">
+            <input type="hidden" name="title" value="<%= game.title %>">
             <div class="mb-3">
               <textarea name="comment" class="form-control" rows="3" placeholder="Your comment" required></textarea>
             </div>
             <button type="submit" class="btn btn-danger">Post Comment</button>
           </form>
+
 
           <div class="comments-wrapper mx-auto p-3">
             <% for (let i = 0; i < userComments.length; i++) { %>
