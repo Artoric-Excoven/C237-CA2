@@ -208,7 +208,7 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
       if (error) throw error;
       if (results.length > 0) {
         connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
-          connection.query('SELECT * FROM userGames WHERE gameId = ?', [gameId], (error, UserOwnedGames) => {
+          connection.query('SELECT * FROM UserGames WHERE gameId = ?', [gameId], (error, UserOwnedGames) => {
             res.render('game', { game: results[0], userComments: comments, user: req.session.user, UserOwnedGames });
           });
         });
@@ -339,6 +339,57 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   });
 })
 
+app.post('/addToCart/:id', checkAuthenticated, (req, res) => {
+    const productId = parseInt(req.params.id);
+    const quantity = parseInt(req.body.quantity) || 1;
+
+    connection.query('SELECT * FROM products WHERE productId = ?', [productId], (error, results) => {
+        if (error) throw error;
+
+        if (results.length > 0) {
+            const product = results[0];
+
+            // Initialize cart in session if not exists
+            if (!req.session.cart) {
+                req.session.cart = [];
+            }
+
+            // Check if product already in cart
+            const existingItem = req.session.cart.find(item => item.productId === productId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                req.session.cart.push({
+                    productId: product.productId,
+                    productName: product.productName,
+                    price: product.price,
+                    quantity: quantity,
+                    image: product.image
+                });
+            }
+
+            res.redirect('/cart');
+        } else {
+            res.status(404).send("Product not found");
+        }
+    });
+});
+
+app.post('/buy', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const gameId = req.body.gameId;
+  const purchaseDate = new Date().toISOString().slice(0, 19).replace('T', ' '); // format: YYYY-MM-DD HH:MM:SS
+
+  const sql = 'INSERT INTO UserGames (userId, gameId, purchaseDate) VALUES (?, ?, ?)';
+  connection.query(sql, [userId, gameId, purchaseDate], (error, results) => {
+    if (error) {
+      console.error("Error adding game:", error);
+      res.status(500).send('Error adding game');
+    } else {
+      res.redirect('/home');
+    }
+  });
+});
 
 // -----------------------------------------------------------------------------------------------------
 
