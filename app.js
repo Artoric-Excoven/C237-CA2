@@ -340,31 +340,23 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
 })
 
 app.post('/addToCart/:id', checkAuthenticated, (req, res) => {
-    const productId = parseInt(req.params.id);
-    const quantity = parseInt(req.body.quantity) || 1;
+    const gameId = parseInt(req.params.id);
 
-    connection.query('SELECT * FROM products WHERE productId = ?', [productId], (error, results) => {
+    connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
         if (error) throw error;
 
         if (results.length > 0) {
-            const product = results[0];
+            const game = results[0];
 
             // Initialize cart in session if not exists
             if (!req.session.cart) {
                 req.session.cart = [];
-            }
-
-            // Check if product already in cart
-            const existingItem = req.session.cart.find(item => item.productId === productId);
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
                 req.session.cart.push({
-                    productId: product.productId,
-                    productName: product.productName,
-                    price: product.price,
-                    quantity: quantity,
-                    image: product.image
+                    gameId: game.gameId,
+                    title: game.title,
+                    price: game.price,
+                    image: game.image,
+                    tag: game.tag
                 });
             }
 
