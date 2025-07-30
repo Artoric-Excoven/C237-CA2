@@ -58,11 +58,21 @@
         <p><b>Description:</b><br> <%= game.desc %></p>
         <p><b>Price:</b><br> $<%= game.price %></p>
         <div class="container mb-4">
-          <% for (let i = 0; i < userComments.length; i++ ) { %>
-            <p><%= userComments[i].username %></p> <br>
-            <p><%= userComments[i].comment %></p>
+          <form action="/add-comment" method="POST" class="comment-form mx-auto mb-4">
+            <div class="mb-3">
+              <textarea name="comment" class="form-control" rows="3" placeholder="Your comment" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger">Post Comment</button>
+          </form>
+
+          <% for (let i = 0; i < userComments.length; i++) { %>
+            <div class="comment-box mx-auto mb-3">
+              <h4><%= userComments[i].username %></h4>
+              <p><%= userComments[i].comment %></p>
+            </div>
           <% } %>
         </div>
+
       <% } else { %>
         <p>No game found.</p>
         <a href ="/vapourstore">Back</a>
