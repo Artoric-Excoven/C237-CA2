@@ -416,6 +416,21 @@ app.post('/buy', checkAuthenticated, (req, res) => {
   });
 });
 
+app.post('/checkout', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const purchaseDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const sql = 'UPDATE UserGames SET purchaseDate = ? WHERE userId = ? AND purchaseDate IS NULL';
+
+  connection.query(sql, [purchaseDate, userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+    res.redirect('/home');
+  });
+});
+
+
 app.post('/addComment', checkAuthenticated, (req, res) => {
   const userId = req.session.user.id;
   const gameId = req.body.gameId;
