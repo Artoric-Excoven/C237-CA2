@@ -3,50 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vapour Library</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <title>Vapour Library</title>
   <style>
+    body {
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      color: #8f2c48;
+      background-color: black;
+      padding: 1rem;
+      font-family: 'Times New Roman', Times, serif;
+    }
+
     .carousel-size {
-      width: 300px;
+      width: 100%;
+      max-width: 300px;
       margin: auto;
     }
-    .carousel-item {
-      transition: transform 0.5s ease-in-out;
-    }
+
     .card {
-      width: 500px;
-      margin: 5%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: none;
+      padding: 1rem;
+      background-color: white;
     }
+
+    .card .btn-primary {
+      width: 80%;
+      margin: 1rem auto 0;
+      display: block;
+      position: relative;
+      transform: none;
+      left: auto;
+      bottom: auto;
+    }
+
+    .gameImageSize {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 12px;
+      transition: transform 0.3s;
+    }
+
+    .gameImageSize:hover {
+      transform: scale(1.05);
+    }
+
     #featured-BG {
       background-image: url('images/vapour.jpg');
       background-size: cover;
       background-position: center;
       height: 600px;
-    }
-    h1 {
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      color: #8f2c48;
-      background-color: black;
-      font-family: 'Times New Roman', Times, serif;
+      padding: 2rem;
     }
-    .gameImageSize {
-      width: 400px;
-      height: 400px;
-      margin: 20px;
+
+    .navbar {
+      margin-bottom: 1rem;
     }
-    .btn-primary {
-      width: 75%;
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+
+    .game-title {
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .game-row {
+      margin-bottom: 2rem;
     }
   </style>
 </head>
 
 <body>
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Vapour Library</a>
@@ -55,32 +92,20 @@
       </button>
       <div class="collapse navbar-collapse d-flex justify-content-between" id="collapsibleNavbar">
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/home">Home</a>
-          </li> 
-          <li class="nav-item">
-            <a class="nav-link" href="/vapourstore">Store</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/cart">Cart</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/vapourstore">Store</a></li>
+          <li class="nav-item"><a class="nav-link" href="/cart">Cart</a></li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              More
-            </a>
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">More</a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/logout">Logout</a></li>
             </ul>
           </li>
-
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              Tag
-            </a>
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Tag</a>
             <form id="tagSearchForm" action="/tagSearch" method="POST" style="display:none;">
               <input type="hidden" name="tag" id="tagInput">
             </form>
-
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#" onclick="submitTag('Role-playing')">Role-playing</a></li>
               <li><a class="dropdown-item" href="#" onclick="submitTag('Action')">Action</a></li>
@@ -90,14 +115,9 @@
               <li><a class="dropdown-item" href="#" onclick="submitTag('Other/Misc')">Other/Misc</a></li>
             </ul>
           </li>
-          
           <% if (user.role === "admin") { %>
-            <li class="nav-item">
-              <a class="nav-link" href="/addGame">Add Game</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/admin">Admin Panel</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="/addGame">Add Game</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin">Admin Panel</a></li>
           <% } %>
         </ul>     
         <form class="d-flex" role="search" action="/search" method="POST">
@@ -108,7 +128,8 @@
     </div>
   </nav>
 
-  <section id="featured-BG" class="container-fluid">
+  <!-- Featured Section -->
+  <section id="featured-BG">
     <h1>Featured</h1>
     <div class="row row-cols-1 row-cols-md-2 g-4">
       <div class="col d-flex justify-content-end">
@@ -116,28 +137,22 @@
           <div class="carousel-size">
             <div id="carousel1" class="carousel slide" data-bs-ride="carousel">
               <div class="carousel-indicators">
-                <button type="button" data-bs-target="#carousel1" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#carousel1" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#carousel1" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carousel1" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#carousel1" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#carousel1" data-bs-slide-to="2"></button>
               </div>
               <div class="carousel-inner">
-                <div class="carousel-item active" data-bs-interval="10000">
-                  <img src="<%= Games[0].image %>" class="d-block w-100" alt=<%= Games[0].title %>>
-                </div>
-                <div class="carousel-item" data-bs-interval="10000">
-                  <img src="<%= Games[1].image %>" class="d-block w-100" alt=<%= Games[1].title %>>
-                </div>
-                <div class="carousel-item" data-bs-interval="10000">
-                  <img src="<%= Games[2].image %>" class="d-block w-100" alt=<%= Games[2].title %>>
-                </div>
+                <% [0,1,2].forEach(i => { %>
+                  <div class="carousel-item <%= i === 0 ? 'active' : '' %>" data-bs-interval="10000">
+                    <img src="<%= Games[i].image %>" class="d-block w-100" alt="<%= Games[i].title %>">
+                  </div>
+                <% }); %>
               </div>
               <button class="carousel-control-prev" type="button" data-bs-target="#carousel1" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
+                <span class="carousel-control-prev-icon"></span>
               </button>
               <button class="carousel-control-next" type="button" data-bs-target="#carousel1" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
+                <span class="carousel-control-next-icon"></span>
               </button>
             </div>
           </div>
@@ -146,15 +161,15 @@
 
       <div class="col">
         <div class="card h-100">
-          <a class="btn btn-primary" href="#" role="button">Click here for more info</a>
-          <div class="carousel-size">
+          <a class="btn btn-primary" href="#">Click here for more info</a>
+          <div class="carousel-size mt-3">
             <div id="carousel2" class="carousel slide" data-bs-ride="carousel">
               <div class="carousel-inner">
                 <div class="carousel-item active" data-bs-interval="10000">
-                  <div>Description<br>Undertale is a 2015 role-playing video game created by American indie developer Toby Fox. The player controls a child who has fallen into the Underground: a large, secluded region under the surface of the Earth, separated by a magical barrier</div>
+                  <div>Description<br>Undertale is a 2015 role-playing video game...</div>
                 </div>
                 <div class="carousel-item" data-bs-interval="10000">
-                  <div>Description<br>Outer Wilds is a 2019 action-adventure game developed by Mobius Digital and published by Annapurna Interactive. The game follows the player character as they explore a planetary system stuck in a 22-minute time loop that resets after the sun goes supernova and destroys the system.</div>
+                  <div>Description<br>Outer Wilds is a 2019 action-adventure game...</div>
                 </div>
                 <div class="carousel-item" data-bs-interval="10000">
                   <div>Description<br>Kill Nam, the one who betrayed our glorious KIM JUNG UN</div>
@@ -167,28 +182,26 @@
     </div>
   </section>
 
+  <!-- Game Listing -->
   <section>
     <div class="container text-center">
       <div class="row"> 
-        <div class="col-12">
-          <br>
-          <h1>All Games</h1>
-        </div>
+        <div class="col-12"><br><h1>All Games</h1></div>
       </div>
       <% for (let i = 0; i < Games.length; i += 4) { %>
-        <div class="row">
+        <div class="row game-row">
           <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
-            <div class="col-3 d-flex justify-content-center **px-2 py-3**">
+            <div class="col-6 col-md-3 d-flex justify-content-center mb-3">
               <a href="/game/<%= encodeURIComponent(Games[j].title) %>?id=<%= Games[j].gameId %>">
                 <img class="gameImageSize" src="<%= Games[j].image %>" alt="<%= Games[j].title %>">
               </a>
             </div>
           <% } %>
         </div>
-        <div class="row">
+        <div class="row mb-4">
           <% for (let j = i; j < i + 4 && j < Games.length; j++) { %>
-            <div class="col-3 d-flex justify-content-center">
-              <p><%= Games[j].title %></p>
+            <div class="col-6 col-md-3 d-flex justify-content-center">
+              <p class="game-title"><%= Games[j].title %></p>
             </div>
           <% } %>
         </div>
@@ -204,8 +217,7 @@
 
       const carousel1Instance = new bootstrap.Carousel(carousel1);
       const carousel2Instance = new bootstrap.Carousel(carousel2);
-      
-      // UPDATE THIS PART TO LINK TO GAMES
+
       const bookLinks = [
         'harrypotter.html',
         'unbroken.html',
@@ -226,9 +238,13 @@
         updateLink(event);
       });
 
-      // Set initial button link
       linkButton.href = bookLinks[0];
     });
+
+    function submitTag(tag) {
+      document.getElementById('tagInput').value = tag;
+      document.getElementById('tagSearchForm').submit();
+    }
   </script>
 </body>
 </html>
