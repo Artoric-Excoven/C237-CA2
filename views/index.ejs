@@ -1,11 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <title>Vapour Library</title>
+  <style>
+    body {
+      background-color: #1b2838;
+      color: #c7d5e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background-color: #171a21 !important;
+      box-shadow: 0 2px 10px #000;
+    }
+
+    .nav-link,
+    .navbar-brand,
+    .dropdown-item {
+      color: #c7d5e0 !important;
+    }
+
+    .nav-link:hover,
+    .dropdown-item:hover {
+      color: #66c0f4 !important;
+    }
+
+    .container {
+      margin-top: 60px;
+      padding: 40px;
+      background-color: #2a475e;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+      max-width: 600px;
+    }
+
+    a {
+      color: #66c0f4;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .btn-outline-success {
+      border-color: #66c0f4;
+      color: #66c0f4;
+    }
+
+    .btn-outline-success:hover {
+      background-color: #66c0f4;
+      color: #000;
+    }
+
+    input.form-control {
+      background-color: #1b2838;
+      color: #c7d5e0;
+      border: 1px solid #66c0f4;
+    }
+
+    input.form-control:focus {
+      background-color: #1b2838;
+      color: #fff;
+      border-color: #ffffff;
+      box-shadow: 0 0 5px #66c0f4;
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
@@ -29,6 +94,9 @@
         <% } else { %>
           <li class="nav-item">
             <a class="nav-link" href="/vapourstore">Store</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/cart">Cart</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -77,20 +145,23 @@
     </div>
   </nav>
 
-  <div class="container">
-      <p style="text-align: center;">
-          <% if (user) {%>
-            <% if (user.role === "admin" || user.role === "user") { %>
-              <br>
-              Back to <a href="/vapourstore">vapourstore!</a>
-            <% } %>
-          <% } else { %>
-          <br>
-          Welcome to Vapour Library<br>
-          Please <a href = "/login" >login</a> to continue...
-          <% } %>
-      </p>
-      
+  <div class="container text-center">
+    <% if (user) { %>
+      <% if (user.role === "admin" || user.role === "user") { %>
+        <h3>Welcome back, <%= user.username %>!</h3>
+        <p>Back to <a href="/vapourstore">Vapour Store</a></p>
+      <% } %>
+    <% } else { %>
+      <h3>Welcome to Vapour Library</h3>
+      <p>Please <a href="/login">login</a> to continue...</p>
+    <% } %>
   </div>
+
+  <script>
+    function submitTag(tagName) {
+      document.getElementById('tagInput').value = tagName;
+      document.getElementById('tagSearchForm').submit();
+    }
+  </script>
 </body>
 </html>

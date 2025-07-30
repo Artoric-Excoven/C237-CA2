@@ -21,6 +21,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/vapourstore">Store</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">Cart</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">More</a>
                         <ul class="dropdown-menu">
@@ -84,7 +87,7 @@
                         <textarea class="form-control rounded-3" id="desc" name="desc" rows="4" required><%= game.desc %></textarea>
                         <div class="invalid-feedback">Please enter a description.</div>
                     </div>
-
+                    <input type="hidden" name="existingImage" value="<%= game.image %>">
                     <div class="mb-4">
                         <label for="image" class="form-label fw-medium text-muted">Game Image</label>
                         <img src="<%= game.image %>" class="img-thumbnail mb-3 img-fluid rounded-3" style="max-width: 150px;" alt="Cover image for <%= game.title %>">
@@ -93,7 +96,7 @@
 
                     <div class="mb-3">
                         <label for="tag" class="form-label fw-medium text-muted">Category</label>
-                        <select class="form-select form-select-lg rounded-3" id="category" name="category" required>
+                        <select class="form-select form-select-lg rounded-3" id="tag" name="tag" required>
                             <option value="" <%= !game.tag ? 'selected' : '' %>>Select a category</option>
                             <option value="Action" <%= game.tag === 'Action' ? 'selected' : '' %>>Action</option>
                             <option value="Adventure" <%= game.tag === 'Adventure' ? 'selected' : '' %>>Adventure</option>

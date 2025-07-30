@@ -198,25 +198,44 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
 });
 
 app.get('/game/:title', checkAuthenticated, (req, res) => {
-  const gameId = req.query.id
+  const gameId = req.query.id;
+  const userId = req.session.user.id;
 
   if (!gameId) {
     return res.status(400).send('Game ID not found');
   }
 
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
+    if (error) throw error;
+    if (results.length === 0) {
+      return res.status(404).send('Game not found');
+    }
+
+    const game = results[0];
+
+    // Fetch comments
+    connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
       if (error) throw error;
-      if (results.length > 0) {
-        connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
-          connection.query('SELECT * FROM userGames WHERE gameId = ?', [gameId], (error, UserOwnedGames) => {
-            res.render('game', { game: results[0], userComments: comments, user: req.session.user, UserOwnedGames: OwnedGame });
-          });
+
+      // Check if the user owns the game
+      const ownershipQuery = 'SELECT * FROM UserGames WHERE userId = ? AND gameId = ? AND purchaseDate IS NOT NULL';
+      connection.query(ownershipQuery, [userId, gameId], (error, ownedResult) => {
+        if (error) throw error;
+
+        const userOwnsGame = ownedResult.length > 0;
+
+        res.render('game', {
+          game,
+          userComments: comments,
+          user: req.session.user,
+          userOwnsGame
         });
-      } else {
-        res.status(404).send('Game not found');
-      }
+      });
+    });
   });
 });
+
+
 
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', { user: req.session.user } ); 
@@ -255,17 +274,26 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
 
 app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
   const gameId = req.params.id;
-  const { title, price, desc, tag } = req.body;
-  const imageUrl = req.file ? req.file.url : null;
+  const { title, price, desc, tag, existingImage } = req.body;
 
-  let sql, params;
-  if (imageUrl) {
-    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag =? WHERE gameId = ?';
+  const imageUrl = req.file ? req.file.path : existingImage;
+
+  let sql = '';
+  let params = [];
+
+  if (imageUrl !== existingImage) {
+    // Image changed
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag = ? WHERE gameId = ?';
     params = [title, price, desc, imageUrl, tag, gameId];
   } else {
+    // No image change
     sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, tag = ? WHERE gameId = ?';
     params = [title, price, desc, tag, gameId];
   }
+
+  // Log SQL for debugging
+  console.log("SQL:", sql);
+  console.log("Params:", params);
 
   connection.query(sql, params, (error, results) => {
     if (error) {
@@ -275,6 +303,7 @@ app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin
     res.redirect('/admin');
   });
 });
+
 
 
 app.get('/deleteGame/:id', checkAuthenticated, (req, res) => {
@@ -339,290 +368,87 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   });
 })
 
+app.post('/addToCart', (req, res) => {
+  const userId = req.session.user.id;
+  const gameId = req.body.gameId;
 
-// -----------------------------------------------------------------------------------------------------
 
-// let games = [
-//   { id: 1, title: "Doki Doki Literature Club", publisher: "Team Salvato", imageUrl: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaG5mOHYzbDFvdXJ0Y2tlZWtkM2ZvazZzbWE3em52Zm9sczV2aXE2MCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/kimYELmyrtIAd1TPFs/giphy.gif" },
-//   { id: 2, title: "Path Of Exile", publisher: "Grinding Gear Games", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLCBn8VYtbHkGlV2hHrPwlkEpl8_ebg7yQ2w&s" },
-//   { id: 3, title: "Minecraft", publisher: "Microsoft", imageUrl: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2ZwOGtocjc4cXY4ZGdleGRqOThrOHR6Z3FuZ24wcnVlaGo1bm4zciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/NM4HoYcdbXdLO/giphy.gif" }
-// ];
-
-// let recentlyDeleted = null;
-// let undoTimer = null;
-
-// // Navbar rendering
-// function renderNavbar() {
-//   return `
-//     <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-//       <div class="container-fluid">
-//         <ul class="navbar-nav">
-//           <li class="nav-item">
-//             <a class="nav-link"><b>Gerald's Gaming Library</b></a>
-//           </li>
-//           <li class="nav-item">
-//             <a class="nav-link" href="/">Home</a>
-//           </li>
-//           <li class="nav-item">
-//             <a class="nav-link" href="/games">Games</a>
-//           </li>
-//           <li class="nav-item">
-//             <a class="nav-link" href="/addgames">Add Game</a>
-//           </li>
-//         </ul>
-//       </div>
-//     </nav>
-//   `;
-// }
-
-// // Page wrapper
-// function renderPage(title, content) {
-//   return `
-//     <!doctype html>
-//     <html lang="en">
-//       <head>
-//         <meta charset="UTF-8" />
-//         <meta name="viewport" content="width=device-width, initial-scale=1" />
-//         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-//         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-//         <title>${title}</title>
-//       </head>
-//       <body class="bg-dark text-white">
-//         ${renderNavbar()}
-//         <div class="container mt-4">
-//           ${content}
-//         </div>
-//       </body>
-//     </html>
-//   `;
-// }
-
-// Routes
-
-app.get('/addgames', (req, res) => {
-  const content = `
-    <h1>Add a Game</h1>
-    <form action="/addgames" method="POST">
-      <div class="mb-3">
-        <label for="title" class="form-label">Game Title:</label>
-        <input id="title" name="title" placeholder="Game Title" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="publisher" class="form-label">Publisher:</label>
-        <input id="publisher" name="publisher" placeholder="Publisher" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="imageUrl" class="form-label">Image URL:</label>
-        <input id="imageUrl" name="imageUrl" placeholder="Image URL (optional)" class="form-control" />
-      </div>
-      <button type="submit" class="btn btn-primary">Add Game</button>
-    </form>
-  `;
-  res.send(renderPage("Add Game", content));
-});
-
-app.post('/addgames', (req, res) => {
-  const newId = games.length ? Math.max(...games.map(g => g.id)) + 1 : 1;
-  games.push({
-    id: newId,
-    title: req.body.title,
-    publisher: req.body.publisher,
-    imageUrl: req.body.imageUrl || ''
-  });
-  res.redirect('/games');
-});
-
-app.get('/games', (req, res) => {
-  const sql = 'SELECT * FROM games';
-  connection.query(sql, (error, results) => {
-    if (error) {
-      console.error('Database query error:', error.message);
-      return res.status(500).send('Error retrieving games');
+  const checkSql = 'SELECT * FROM UserGames WHERE userId = ? AND gameId = ? AND purchaseDate IS NULL';
+  connection.query(checkSql, [userId, gameId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
     }
-    res.render('games', { games: results });
-  });
-});
 
-//   let listItems = games.map(game => `
-//     <li class="list-group-item bg-secondary text-white">
-//       <strong>${game.title}</strong> (Publisher: ${game.publisher})<br>
-//       ${game.imageUrl ? `<img src="${game.imageUrl}" class="img-thumbnail mb-2" style="max-width: 200px;" alt="${game.title} Cover" />` : ''}
-//       <form action="/editgames/${game.id}" method="GET" class="d-inline me-2">
-//         <button class="btn btn-success btn-sm mt-2" type="submit">Edit</button>
-//       </form>
-//       <form action="/deletegames/${game.id}" method="POST" class="d-inline">
-//         <button class="btn btn-danger btn-sm mt-2" type="submit">Delete</button>
-//       </form>
-//     </li>
-//   `).join('');
+    if (results.length > 0) {
 
-//   const content = `
-//     <h1>Game List</h1>
-//     <ul class="list-group">
-//       ${listItems}
-//     </ul>
-//   `;
-
-//   res.send(renderPage("Game List", content));
-// });
-
-app.get('/editgames/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const game = games.find(g => g.id === id);
-
-  if (!game) {
-    return res.send(renderPage("Game Not Found", `
-      <p>Game not found.</p>
-      <a href="/games" class="btn btn-secondary">Back to List</a>
-    `));
-  }
-
-  const content = `
-    <h1>Edit Game</h1>
-    <form action="/editgames/${game.id}" method="POST">
-      <div class="mb-3">
-        <label for="title" class="form-label">Game Title:</label>
-        <input id="title" name="title" value="${game.title}" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="publisher" class="form-label">Publisher:</label>
-        <input id="publisher" name="publisher" value="${game.publisher}" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="imageUrl" class="form-label">Image URL:</label>
-        <input id="imageUrl" name="imageUrl" value="${game.imageUrl || ''}" class="form-control" />
-      </div>
-      <button type="submit" class="btn btn-primary">Update Game</button>
-    </form>
-    <a href="/games" class="btn btn-secondary mt-3">Back to List</a>
-  `;
-  res.send(renderPage("Edit Game", content));
-});
-
-app.post('/editgames/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const game = games.find(g => g.id === id);
-
-  if (game) {
-    game.title = req.body.title;
-    game.publisher = req.body.publisher;
-    game.imageUrl = req.body.imageUrl;
-  }
-
-  res.redirect('/games');
-});
-
-app.post('/deletegames/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = games.findIndex(g => g.id === id);
-
-  if (index !== -1) {
-    recentlyDeleted = games[index];
-    games.splice(index, 1);
-
-    if (undoTimer) clearTimeout(undoTimer);
-    undoTimer = setTimeout(() => {
-      recentlyDeleted = null;
-    }, 10000);
-
-    res.redirect('/undo');
-  } else {
-    res.redirect('/games');
-  }
-});
-
-app.get('/undo', (req, res) => {
-  let content = `<h1>Game Deleted</h1>`;
-
-  if (recentlyDeleted) {
-    content += `
-      <p><strong>${recentlyDeleted.title}</strong> was deleted.</p>
-      <form action="/restore" method="POST">
-        <button class="btn btn-warning">Undo Delete</button>
-      </form>
-      <p class="mt-2 text-muted">This option will expire in 10 seconds.</p>
-    `;
-  } else {
-    content += "<p>Undo period has expired.</p>";
-  }
-
-  res.send(renderPage("Undo Delete", content));
-});
-
-app.post('/restore', (req, res) => {
-  if (recentlyDeleted) {
-    games.push(recentlyDeleted);
-    recentlyDeleted = null;
-    clearTimeout(undoTimer);
-  }
-  res.redirect('/games');
-});
-// -------------CART ------------------- //
-app.use((req, res, next) => {
-  if (!req.session.cart) {
-    req.session.cart = [];
-  }
-  next();
-});
-
-app.get('/cart', checkAuthenticated, (req,res) => {
-  res.render('cart', {
-    user: req.session.user, 
-    cart: req.session.cart,
-    messages: req.flash('Success')
-  });
-});
-
-app.post('/addcart', checkAuthenticated, (req, res) =>  {
-  const { gameId, productName, price, image} = req.body;
-  let cart = req.session.cart;
-  let found = false;
-
-  for (let i = 0; i < cart.length; i++) {
-    if (cart[i].gameId == gameId) {
-      cart[i].quantity += 1;
-      found = true;
-      break;
+      return res.redirect('/cart');
     }
-  }
 
-  if (!found) {
-    cart.push({
-      gameId: gameId,
-      productName: productName,
-      price: parseFloat(price),
-      image: image,
-      quantity: 1
+
+    const insertSql = 'INSERT INTO UserGames (userId, gameId, purchaseDate) VALUES (?, ?, NULL)';
+    connection.query(insertSql, [userId, gameId], (err2, insertResult) => {
+      if (err2) {
+        console.error(err2);
+        return res.status(500).send('Server error');
+      }
+
+      res.redirect('/cart');
     });
-  }
-
-  res.redirect('/cart');
+  });
 });
 
-app.post('/removefromcart', checkAuthenticated, (req, res) => {
-  const { gameId } = req.body;
 
-  const cart = req.session.cart;
 
-  for (let i = 0; i < cart.length; i++) {
-    if (cart[i].gameId === gameId) {
-      cart.splice(i, 1);
-      break;
+app.post('/buy', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const gameId = req.body.gameId;
+  const purchaseDate = new Date().toISOString().slice(0, 19).replace('T', ' '); // format: YYYY-MM-DD HH:MM:SS
+
+  const sql = 'INSERT INTO UserGames (userId, gameId, purchaseDate) VALUES (?, ?, ?)';
+  connection.query(sql, [userId, gameId, purchaseDate], (error, results) => {
+    if (error) {
+      console.error("Error adding game:", error);
+      res.status(500).send('Error adding game');
+    } else {
+      res.redirect('/home');
     }
-  }
-
-  res.redirect('/cart');
+  });
 });
 
-app.post('/checkout', checkAuthenticated, (req,res) => {
-  req.session.cart = [];
-  req.flash('Success', 'Checkout successful! Thank you for your purchase.');
-  res.redirect('/cart');
+app.post('/checkout', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const purchaseDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const sql = 'UPDATE UserGames SET purchaseDate = ? WHERE userId = ? AND purchaseDate IS NULL';
+
+  connection.query(sql, [purchaseDate, userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+    res.redirect('/home');
+  });
 });
-//-------------CART ------------------- //
+
+
+app.post('/addComment', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const gameId = req.body.gameId;
+  const username = req.session.user.username;
+  const comment = req.body.comment;
+
+  connection.query(
+    'INSERT INTO UserComments (userId, gameId, username, comment) VALUES (?, ?, ?, ?)', [userId, gameId, username, comment], (error, results) => {
+      if (error) {
+        console.error("Error adding comment:", error);
+        res.status(500).send('Error adding comment');
+      } else {
+        res.redirect(`/game/${encodeURIComponent(req.body.title)}?id=${gameId}`);
+      }
+    }
+  );
+});
 
 
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// TEST COMMIT
