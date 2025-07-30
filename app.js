@@ -205,12 +205,7 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
       if (error) throw error;
       if (results.length > 0) {
         connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
-          if (comments.length > 0) {
-            connection.query('SELECT * FROM Users'), (error, allUsers) => {
-              const usernames = allUsers.username
-              res.render('game', { game: results[0], userComments: comments, user: req.session.user, userCommentNames: usernames });
-            };
-          };
+          res.render('game', { game: results[0], userComments: comments, user: req.session.user});
         });
       } else {
         res.status(404).send('Game not found');

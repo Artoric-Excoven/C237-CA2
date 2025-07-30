@@ -58,13 +58,15 @@
         <p><b>Description:</b><br> <%= game.desc %></p>
         <p><b>Price:</b><br> $<%= game.price %></p>
         <div class="container mb-4">
-          <% <p></p> %>
+          <% for (let i = 0; i < usercomments.length; i++ ) { %>
+            <p><%= userComments[i].username %></p> <br>
+            <p><%= userComments[i].comment %></p>
+          <% } %>
         </div>
       <% } else { %>
         <p>No game found.</p>
         <a href ="/vapourstore">Back</a>
       <% } %>
   </div>
-    
 </body>
 </html>
