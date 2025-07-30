@@ -30,10 +30,16 @@
 
       .comments-wrapper {
         width: 80%;
-        background-color: #2e2e2e; /* dark grey */
-        border: 2px solid #b22222; /* firebrick red */
+        background-color: #2e2e2e;
+        border: 2px solid #b22222;
         border-radius: 10px;
+
+        /* Flexbox centering */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
+
     </style>
 </head>
 <body>
@@ -87,10 +93,7 @@
         <p><b>Description:</b><br> <%= game.desc %></p>
         <p><b>Price:</b><br> $<%= game.price %></p>
         <div class="container mb-4">
-          <form action="/add-comment" method="POST" class="comment-form mx-auto mb-4">
-            <div class="mb-3">
-              <input type="text" name="username" class="form-control" placeholder="Your name" required>
-            </div>
+          <form action="/addComment" method="POST" class="comment-form mx-auto mb-4">
             <div class="mb-3">
               <textarea name="comment" class="form-control" rows="3" placeholder="Your comment" required></textarea>
             </div>
