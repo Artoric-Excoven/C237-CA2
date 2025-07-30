@@ -198,25 +198,44 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
 });
 
 app.get('/game/:title', checkAuthenticated, (req, res) => {
-  const gameId = req.query.id
+  const gameId = req.query.id;
+  const userId = req.session.user.id;
 
   if (!gameId) {
     return res.status(400).send('Game ID not found');
   }
 
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
+    if (error) throw error;
+    if (results.length === 0) {
+      return res.status(404).send('Game not found');
+    }
+
+    const game = results[0];
+
+    // Fetch comments
+    connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
       if (error) throw error;
-      if (results.length > 0) {
-        connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
-          connection.query('SELECT * FROM UserGames WHERE gameId = ?', [gameId], (error, UserOwnedGames) => {
-            res.render('game', { game: results[0], userComments: comments, user: req.session.user, OwnedGame: UserOwnedGames });
-          });
+
+      // Check if the user owns the game
+      const ownershipQuery = 'SELECT * FROM UserGames WHERE userId = ? AND gameId = ? AND purchaseDate IS NOT NULL';
+      connection.query(ownershipQuery, [userId, gameId], (error, ownedResult) => {
+        if (error) throw error;
+
+        const userOwnsGame = ownedResult.length > 0;
+
+        res.render('game', {
+          game,
+          userComments: comments,
+          user: req.session.user,
+          userOwnsGame
         });
-      } else {
-        res.status(404).send('Game not found');
-      }
+      });
+    });
   });
 });
+
+
 
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
   res.render('addGame', { user: req.session.user } ); 
@@ -339,6 +358,37 @@ app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
   });
 })
 
+app.post('/addToCart', (req, res) => {
+  const userId = req.session.user.id;
+  const gameId = req.body.gameId;
+
+
+  const checkSql = 'SELECT * FROM UserGames WHERE userId = ? AND gameId = ? AND purchaseDate IS NULL';
+  connection.query(checkSql, [userId, gameId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+
+    if (results.length > 0) {
+
+      return res.redirect('/cart');
+    }
+
+
+    const insertSql = 'INSERT INTO UserGames (userId, gameId, purchaseDate) VALUES (?, ?, NULL)';
+    connection.query(insertSql, [userId, gameId], (err2, insertResult) => {
+      if (err2) {
+        console.error(err2);
+        return res.status(500).send('Server error');
+      }
+
+      res.redirect('/cart');
+    });
+  });
+});
+
+
 
 app.post('/buy', checkAuthenticated, (req, res) => {
   const userId = req.session.user.id;
@@ -355,6 +405,22 @@ app.post('/buy', checkAuthenticated, (req, res) => {
     }
   });
 });
+
+app.post('/checkout', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+  const purchaseDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+  const sql = 'UPDATE UserGames SET purchaseDate = ? WHERE userId = ? AND purchaseDate IS NULL';
+  connection.query(sql, [purchaseDate, userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+
+    res.redirect('/home'); 
+  });
+});
+
 
 const PORT = process.env.PORT || 61002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
