@@ -123,8 +123,8 @@
         </div>
       <% } %>
     </div>
-
-    <img src="<%= advertisement.image %>" alt="Right Image" class="side-img">
+    
+    <img id="right-ad" src="" alt="Right Image" class="side-img">
   </div>
   <script>
     const ads = JSON.parse('<%= JSON.stringify(adverts.map(ad => ad.image)) %>');
