@@ -209,7 +209,7 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
       if (results.length > 0) {
         connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
           connection.query('SELECT * FROM UserGames WHERE gameId = ?', [gameId], (error, UserOwnedGames) => {
-            res.render('game', { game: results[0], userComments: comments, user: req.session.user, UserOwnedGames });
+            res.render('game', { game: results[0], userComments: comments, user: req.session.user, OwnedGame: UserOwnedGames });
           });
         });
       } else {
