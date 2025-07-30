@@ -241,7 +241,7 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
         if (error) throw error;
 
         if (results.length > 0) {
-            res.render('editGame', { game : results[0] });
+            res.render('editGame', { game : results[0], user: req.session.user });
         } else {
             res.status(404).send('Game not found');
         }
