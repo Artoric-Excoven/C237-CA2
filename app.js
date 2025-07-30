@@ -274,17 +274,26 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
 
 app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
   const gameId = req.params.id;
-  const { title, price, desc, tag } = req.body;
-  const imageUrl = req.file ? req.file.url : null;
+  const { title, price, desc, tag, existingImage } = req.body;
 
-  let sql, params;
-  if (imageUrl) {
-    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag =? WHERE gameId = ?';
+  const imageUrl = req.file ? req.file.path : existingImage;
+
+  let sql = '';
+  let params = [];
+
+  if (imageUrl !== existingImage) {
+    // Image changed
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag = ? WHERE gameId = ?';
     params = [title, price, desc, imageUrl, tag, gameId];
   } else {
+    // No image change
     sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, tag = ? WHERE gameId = ?';
     params = [title, price, desc, tag, gameId];
   }
+
+  // Log SQL for debugging
+  console.log("SQL:", sql);
+  console.log("Params:", params);
 
   connection.query(sql, params, (error, results) => {
     if (error) {
@@ -294,6 +303,7 @@ app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin
     res.redirect('/admin');
   });
 });
+
 
 
 app.get('/deleteGame/:id', checkAuthenticated, (req, res) => {
@@ -406,19 +416,22 @@ app.post('/buy', checkAuthenticated, (req, res) => {
   });
 });
 
-app.post('/checkout', checkAuthenticated, (req, res) => {
+app.post('/addComment', checkAuthenticated, (req, res) => {
   const userId = req.session.user.id;
-  const purchaseDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const gameId = req.body.gameId;
+  const username = req.session.user.username;
+  const comment = req.body.comment;
 
-  const sql = 'UPDATE UserGames SET purchaseDate = ? WHERE userId = ? AND purchaseDate IS NULL';
-  connection.query(sql, [purchaseDate, userId], (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('Server error');
+  connection.query(
+    'INSERT INTO UserComments (userId, gameId, username, comment) VALUES (?, ?, ?, ?)', [userId, gameId, username, comment], (error, results) => {
+      if (error) {
+        console.error("Error adding comment:", error);
+        res.status(500).send('Error adding comment');
+      } else {
+        res.redirect(`/game/${encodeURIComponent(req.body.title)}?id=${gameId}`);
+      }
     }
-
-    res.redirect('/home'); 
-  });
+  );
 });
 
 
