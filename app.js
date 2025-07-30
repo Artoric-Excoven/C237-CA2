@@ -41,7 +41,7 @@ connection.connect((err) => {
 // Set up view engine
 app.set('view engine', 'ejs');
 //  enable static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 // enable form processing
 app.use(express.urlencoded({
     extended: false
@@ -166,9 +166,25 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-app.get('/home',  (req, res) => {
-    res.render('home', {user: req.session.user} );
+app.get('/home', checkAuthenticated, (req, res) => {
+  const userId = req.session.user.id;
+
+  connection.query('SELECT * FROM UserGames WHERE userId = ?', [userId], (error, gamesOwned) => {
+    if (error) throw error;
+    const gamesId = gamesOwned.map(row => row.gameId);
+
+    if (gamesId.length === 0) {
+      if (error) throw error;
+      return res.render('home', { games: [], user: req.session.user });
+    } else {
+      connection.query('SELECT * FROM Games WHERE gameId IN (?)', [gamesId], (error, results) => {
+        if (error) throw error;
+        res.render('home', { games: results, user: req.session.user });
+      });
+    }
+  });
 });
+
 
 app.get('/vapourstore', checkAuthenticated, (req,res) => {
   // Fetch data from MySQL

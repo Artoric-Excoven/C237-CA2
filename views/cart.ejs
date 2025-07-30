@@ -64,6 +64,7 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Total</th>
+            <th>Remove</th>
           </tr>
         </thead>
         <tbody>
@@ -74,13 +75,6 @@
                 <td><img src="/images/<%= cart[i].image %>" width="80" class="img-thumbnail"></td>
                 <td><%= cart[i].quantity %></td>
                 <td>$<%= (cart[i].price * cart[i].quantity).toFixed(2) %></td>
-                <td>
-                  <!--Remove item button -->
-                  <form action="/removefromcart" method="POST">
-                    <input type="hidde" name="gameId" value="<%= cart[i].gameId %>">
-                    <button type="submit" class="btn btn-danger btn-sm mt-2">Remove</button>
-                  </form>
-                </td>
             </tr>
             <% total += cart[i].price * cart[i].quantity; %>
           <% }; %>

@@ -11,7 +11,7 @@
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Vapour Library</a>
+      <a class="navbar-brand" href="/">Vapourrrr Library</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -19,7 +19,7 @@
         <ul class="navbar-nav">
           <li class="nav-item">
             <a class="nav-link" href="/home">Home</a>
-          </li> 
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="/vapourstore">Store</a>
           </li>
@@ -39,7 +39,7 @@
               <a class="nav-link" href="/admin">Admin Panel</a>
             </li>
           <% } %>
-        </ul>     
+        </ul>
         <form class="d-flex" role="search" action="/search" method="POST">
           <input class="form-control me-2" type="search" name="query" placeholder="Search" required />
           <button class="btn btn-outline-success" type="submit">Search</button>
@@ -47,6 +47,33 @@
       </div>
     </div>
   </nav>
-  <!-- ADD CODE HERE -->
+  <!-- Game Library Section -->
+  <div class="container mt-4">
+    <h2>Your Game Library</h2>
+
+    <% if (games.length === 0) { %>
+      <div class="alert alert-warning mt-3">
+        You don't own any games yet. Visit the <a href="/vapourstore" class="alert-link">Vapour Store</a> to buy some!
+      </div>
+    <% } else { %>
+      <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+        <% games.forEach(function(game) { %>
+          <div class="col">
+            <div class="card h-100 bg-secondary text-white">
+              <% if (game.image) { %>
+                <img src="<%= game.image %>" class="card-img-top" alt="<%= game.title %> Cover">
+              <% } %>
+              <div class="card-body">
+                <h5 class="card-title"><%= game.title %></h5>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title"><% game.desc %></h5>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
 </body>
 </html>
