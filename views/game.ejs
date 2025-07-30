@@ -27,6 +27,13 @@
       .comment-form textarea::placeholder {
         color: #ccc;
       }
+
+      .comments-wrapper {
+        width: 80%;
+        background-color: #2e2e2e; /* dark grey */
+        border: 2px solid #b22222; /* firebrick red */
+        border-radius: 10px;
+      }
     </style>
 </head>
 <body>
@@ -82,18 +89,24 @@
         <div class="container mb-4">
           <form action="/add-comment" method="POST" class="comment-form mx-auto mb-4">
             <div class="mb-3">
+              <input type="text" name="username" class="form-control" placeholder="Your name" required>
+            </div>
+            <div class="mb-3">
               <textarea name="comment" class="form-control" rows="3" placeholder="Your comment" required></textarea>
             </div>
             <button type="submit" class="btn btn-danger">Post Comment</button>
           </form>
 
-          <% for (let i = 0; i < userComments.length; i++) { %>
-            <div class="comment-box mx-auto mb-3">
-              <h4><%= userComments[i].username %></h4>
-              <p><%= userComments[i].comment %></p>
-            </div>
-          <% } %>
+          <div class="comments-wrapper mx-auto p-3">
+            <% for (let i = 0; i < userComments.length; i++) { %>
+              <div class="comment-box mb-3">
+                <h4><%= userComments[i].username %></h4>
+                <p><%= userComments[i].comment %></p>
+              </div>
+            <% } %>
+          </div>
         </div>
+
 
       <% } else { %>
         <p>No game found.</p>
