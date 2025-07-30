@@ -221,11 +221,11 @@ app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
 });
 
 app.post('/addGame', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
-  const { title, price, desc } = req.body;
+  const { title, price, desc, tag } = req.body;
   const imageUrl = req.file.path; // Cloudinary URL into DB
 
-  const sql = 'INSERT INTO Games (title, price, `desc`, image) VALUES (?, ?, ?, ?)';
-  connection.query(sql, [title, price, desc, imageUrl], (error, results) => {
+  const sql = 'INSERT INTO Games (title, price, `desc`, image, tag) VALUES (?, ?, ?, ?, ?)';
+  connection.query(sql, [title, price, desc, imageUrl, tag], (error, results) => {
     if (error) {
       console.error("Error adding game:", error);
       res.status(500).send('Error adding game');
@@ -253,16 +253,16 @@ app.get('/editGame/:id',checkAuthenticated, checkAdmin, (req,res) => {
 
 app.post('/editGame/:id', upload.single('image'), checkAuthenticated, checkAdmin, (req, res) => {
   const gameId = req.params.id;
-  const { title, price, desc } = req.body;
+  const { title, price, desc, tag } = req.body;
   const imageUrl = req.file ? req.file.url : null;
 
   let sql, params;
   if (imageUrl) {
-    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ? WHERE gameId = ?';
-    params = [title, price, desc, imageUrl, gameId];
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, image = ?, tag =? WHERE gameId = ?';
+    params = [title, price, desc, imageUrl, tag, gameId];
   } else {
-    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ? WHERE gameId = ?';
-    params = [title, price, desc, gameId];
+    sql = 'UPDATE Games SET title = ?, price = ?, `desc` = ?, tag = ? WHERE gameId = ?';
+    params = [title, price, desc, tag, gameId];
   }
 
   connection.query(sql, params, (error, results) => {
