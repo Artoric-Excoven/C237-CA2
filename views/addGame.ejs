@@ -29,6 +29,7 @@
       color: #ffffff;               
       border: 1px solid #66c0f4;    
     }
+
     .form-control:focus {
       background-color: #1b2838;
       color: #ffffff;
@@ -36,7 +37,6 @@
       box-shadow: 0 0 0 0.2rem rgba(102, 192, 244, 0.25);
     }
 
-  
     .btn-login {
       background-color: #66c0f4;
       color: #1b2838;
@@ -117,8 +117,8 @@
   
         <div class="mb-3">
           <label for="desc" class="form-label">Game Description:</label>
-          <textarea name="desc" placeholder="Add description" max-length="255" rows="4" cols="50" required
-            style="resize: none;"></textarea>
+          <textarea class="form-control" name="desc" placeholder="Add description" max-length="255" rows="4" required style="resize: none;">
+          </textarea>
         </div>
   
         <div class="mb-4">
