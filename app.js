@@ -368,7 +368,7 @@ app.post('/addToCart', checkAuthenticated, (req, res) => {
     }
 
 
-    const insertSql = 'INSERT INTO UserGames (userId, gameId, purchaseDate) VALUES (?, ?, NULL)';
+    const insertSql = 'INSERT INTO UserGames (userId, gameId) VALUES (?, ?)';
     connection.query(insertSql, [userId, gameId], (err2, insertResult) => {
       if (err2) {
         console.error('Insert error:', err2);
