@@ -198,8 +198,7 @@ app.get('/vapourstore', checkAuthenticated, (req,res) => {
 });
 
 app.get('/game/:title', checkAuthenticated, (req, res) => {
-  const gameId = req.query.id;
-  const userId = req.session.user.id;
+  const gameId = req.query.id
 
   if (!gameId) {
     return res.status(400).send('Game ID not found');
@@ -207,34 +206,17 @@ app.get('/game/:title', checkAuthenticated, (req, res) => {
 
   connection.query('SELECT * FROM Games WHERE gameId = ?', [gameId], (error, results) => {
     if (error) throw error;
-    if (results.length === 0) {
-      return res.status(404).send('Game not found');
-    }
-
-    const game = results[0];
-
-    // Fetch comments
-    connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
-      if (error) throw error;
-
-      // Check if the user owns the game
-      const ownershipQuery = 'SELECT * FROM UserGames WHERE userId = ? AND gameId = ? AND purchaseDate IS NOT NULL';
-      connection.query(ownershipQuery, [userId, gameId], (error, ownedResult) => {
-        if (error) throw error;
-
-        const userOwnsGame = ownedResult.length > 0;
-
-        res.render('game', {
-          game,
-          userComments: comments,
-          user: req.session.user,
-          userOwnsGame
+    if (results.length > 0) {
+        connection.query('SELECT * FROM UserComments WHERE gameId = ?', [gameId], (error, comments) => {
+          connection.query('SELECT * FROM UserGames WHERE gameId = ?', [gameId], (error, UserOwnedGames) => {
+            res.render('game', { game: results[0], userComments: comments, user: req.session.user, OwnedGame: UserOwnedGames });
+          });
         });
-      });
-    });
+    } else {
+      res.status(404).send('Game not found');
+    }
   });
 });
-
 
 
 app.get('/addGame', checkAuthenticated, checkAdmin, (req, res) => {
